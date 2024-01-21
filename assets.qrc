@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/очистить поиск.png</file>
+        <file>assets/поиск.png</file>
+        <file>assets/добавить фильтр.png</file>
+        <file>assets/сбросить фильтр.png</file>
+    </qresource>
+</RCC>
