@@ -12,6 +12,7 @@ public:
     virtual QString namePlugin() const = 0;
     virtual void openGameWindow() = 0;
     virtual void closingAction(std::function<void()> fun) = 0;
+    virtual QVector<int> getOptionNumberOfPlayers() = 0;
 };
 
 Q_DECLARE_INTERFACE(GamePluginInterface, "gamePluginInterface")
