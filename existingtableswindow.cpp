@@ -17,6 +17,7 @@ ExistingTablesWindow::ExistingTablesWindow(QWidget *parent)
 
 ExistingTablesWindow::~ExistingTablesWindow()
 {
+    qDebug() << "dd";
     delete _centralwidget;
 }
 
@@ -773,7 +774,7 @@ void ExistingTablesWindow::setValueToMaxPage(int maxPage)
 void ExistingTablesWindow::closeEvent(QCloseEvent* event)
 {
     QMainWindow::closeEvent(event);
-    delete this;
+
     MainWindow* w = new MainWindow();
     w->show();
 }
@@ -781,8 +782,7 @@ void ExistingTablesWindow::closeEvent(QCloseEvent* event)
 void ExistingTablesWindow::changeNumberRows()
 {
     QPushButton* button = (QPushButton*)sender();
-    QStringList nums;
-    nums = button->objectName().split('_');
+    QStringList nums = button->objectName().split('_');
 
     if (nums.size() >= 3)
         QString num = nums[2];

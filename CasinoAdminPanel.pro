@@ -32,8 +32,7 @@ HEADERS += \
     mythread.h
 
 FORMS += \
-    creategametablewindow.ui \
-    mainwindow.ui
+    creategametablewindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

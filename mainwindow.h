@@ -12,15 +12,27 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    QWidget* centralwidget;
+
+    QVBoxLayout* verticalLayout;
+
+    QPushButton* _openCreateGameTableWin;
+    QPushButton* _openExistingTablesWin;
+    QPushButton* _openLoanApplicationsWin;
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_3_clicked();
-
 private:
-    Ui::MainWindow *ui;
+    void renderingInterface();
+    void connects();
+
+private slots:
+    void openCreateGameTableWin();
+    void openExistingTablesWin();
+    void openLoanApplicationsWin();
+
 };
 #endif // MAINWINDOW_H
