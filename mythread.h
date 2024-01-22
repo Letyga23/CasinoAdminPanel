@@ -30,9 +30,9 @@ public:
     MyThread(QObject* parent = nullptr);
     ~MyThread() override;
     void setTask(std::function<void()> task);
-    void completion(QSharedPointer<QSqlQueryModel> model, int limit, int offset, QString filters, QString sort);
-    void getMaxPage(int rowsPerPage, QString filters);
-    void search(QString column, QString like, QString typeSearch, QString filters, QString sort, int limit, int offset);
+    void completion(QSharedPointer<QSqlQueryModel> model, QString nameTable, int limit, int offset, QString filters, QString sort);
+    void getMaxPage(QString nameTable, int rowsPerPage, QString filters);
+    void search(QString nameTable, QString column, QString like, QString typeSearch, QString filters, QString sort, int limit, int offset);
     bool isRun();
 
 protected:
