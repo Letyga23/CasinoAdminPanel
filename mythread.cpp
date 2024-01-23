@@ -12,7 +12,7 @@ MyThread::MyThread(QObject* parent)
 {
     QString connectionName = "Connection_" + QString::number(QRandomGenerator::global()->generate());
     _db = QSharedPointer<QSqlDatabase>::create(QSqlDatabase::addDatabase("QSQLITE", connectionName));
-    _db->setDatabaseName("Database/name.sqlite");
+    _db->setDatabaseName("Database/casino.sqlite");
 
     _query = QSharedPointer<QSqlQueryModel>::create();
 }

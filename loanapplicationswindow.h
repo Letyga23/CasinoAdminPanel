@@ -1,5 +1,5 @@
-﻿#ifndef EXISTINGTABLESWINDOW_H
-#define EXISTINGTABLESWINDOW_H
+﻿#ifndef LOANAPPLICATIONSWINDOW_H
+#define LOANAPPLICATIONSWINDOW_H
 
 #include <QMainWindow>
 #include <QDebug>
@@ -31,7 +31,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-class ExistingTablesWindow : public QMainWindow
+class LoanApplicationsWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -122,8 +122,8 @@ private:
     QString _pushButtonStyleSheet;
 
 public:
-    ExistingTablesWindow(QWidget* parent = nullptr);
-    ~ExistingTablesWindow();
+    LoanApplicationsWindow(QWidget* parent = nullptr);
+    ~LoanApplicationsWindow();
 
 private:
     void updateCurrentPageInLabel();
@@ -172,4 +172,5 @@ private slots:
     void onHeaderClicked(int logicalIndex);
     void changeNumberRows();
 };
-#endif // EXISTINGTABLESWINDOW_H
+
+#endif // LOANAPPLICATIONSWINDOW_H

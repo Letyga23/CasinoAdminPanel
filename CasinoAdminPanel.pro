@@ -19,6 +19,7 @@ SOURCES += \
     creategametablewindow.cpp \
     existingtableswindow.cpp \
     filterdialog.cpp \
+    loanapplicationswindow.cpp \
     main.cpp \
     mainwindow.cpp \
     mythread.cpp
@@ -28,11 +29,9 @@ HEADERS += \
     existingtableswindow.h \
     filterdialog.h \
     gamePluginInterface.h \
+    loanapplicationswindow.h \
     mainwindow.h \
     mythread.h
-
-FORMS += \
-    creategametablewindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -40,6 +39,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    Database/casino.sqlite \
     Database/name.sqlite \
     assets/добавить фильтр.png \
     assets/очистить поиск.png \

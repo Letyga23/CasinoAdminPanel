@@ -1,6 +1,5 @@
 ﻿#include "mainwindow.h"
 #include "creategametablewindow.h"
-#include "existingtableswindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,17 +30,22 @@ void MainWindow::openExistingTablesWin()
 
 void MainWindow::openLoanApplicationsWin()
 {
-
+    LoanApplicationsWindow* w = new LoanApplicationsWindow();
+    w->show();
+    close();
 }
 
 void MainWindow::renderingInterface()
 {
+    setWindowTitle("Админ панель");
+    resize(300, 280);
+
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(0);
     sizePolicy.setVerticalStretch(0);
 
     QFont font;
-    font.setFamily(QString::fromUtf8("Segoe UI"));
+    font.setFamily("Segoe UI");
     font.setPointSize(20);
 
     centralwidget = new QWidget(this);
@@ -67,8 +71,6 @@ void MainWindow::renderingInterface()
     verticalLayout->addWidget(_openLoanApplicationsWin);
 
     setCentralWidget(centralwidget);
-
-    resize(300, 280);
 }
 
 void MainWindow::connects()
