@@ -1,17 +1,17 @@
 ﻿#ifndef CREATEGAMETABLEWINDOW_H
 #define CREATEGAMETABLEWINDOW_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QMap>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QPushButton>
 #include "gamePluginInterface.h"
 
-class CreateGameTableWindow : public QDialog
+class CreateGameTableTab : public QWidget
 {
-    Q_OBJECT
     QMap<int, GamePluginInterface*> _games;
 
 private:
@@ -42,8 +42,8 @@ private:
     QFont _fontBold;
 
 public:
-    explicit CreateGameTableWindow(QWidget *parent = nullptr);
-    ~CreateGameTableWindow();
+    explicit CreateGameTableTab();
+    ~CreateGameTableTab();
 
 private slots:
     void creating();

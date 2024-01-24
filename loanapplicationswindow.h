@@ -1,7 +1,7 @@
 ﻿#ifndef LOANAPPLICATIONSWINDOW_H
 #define LOANAPPLICATIONSWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QDebug>
 #include <QMessageBox>
 #include <QTableView>
@@ -31,7 +31,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-class LoanApplicationsWindow : public QMainWindow
+class LoanApplicationsWindow : public QWidget
 {
     Q_OBJECT
 
@@ -64,8 +64,6 @@ class LoanApplicationsWindow : public QMainWindow
     QString _tableWorkInDB;
 
 private:
-    QWidget* _centralwidget;
-
     QLabel* _labelSearch;
     QLabel* _labelGoToPageNum;
     QLabel* _labelSelectPage;
@@ -122,7 +120,7 @@ private:
     QString _pushButtonStyleSheet;
 
 public:
-    LoanApplicationsWindow(QWidget* parent = nullptr);
+    LoanApplicationsWindow(QStatusBar* statusBar);
     ~LoanApplicationsWindow();
 
 private:

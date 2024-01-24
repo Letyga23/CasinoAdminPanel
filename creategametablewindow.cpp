@@ -2,29 +2,23 @@
 #include <QDir>
 #include <QPluginLoader>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QDebug>
+#include "adminpanelwindow.h"
 
-CreateGameTableWindow::CreateGameTableWindow(QWidget *parent) :
-    QDialog(parent)
+CreateGameTableTab::CreateGameTableTab()
 {
     renderingInterface();
     connects();
-
     loadPlugins();
 }
 
-CreateGameTableWindow::~CreateGameTableWindow()
+CreateGameTableTab::~CreateGameTableTab()
 {
-    delete verticalLayout;
+    delete this;
 }
 
-void CreateGameTableWindow::renderingInterface()
+void CreateGameTableTab::renderingInterface()
 {
-    setWindowTitle("Создание стола");
-
-    verticalLayout = new QVBoxLayout(this);
-
     _fontLabel.setFamily("Segoe UI");
     _fontLabel.setPointSize(14);
 
@@ -32,13 +26,15 @@ void CreateGameTableWindow::renderingInterface()
     _fontBold.setPointSize(18);
     _fontBold.setBold(true);
 
+    verticalLayout = new QVBoxLayout(this);
+
     renderingLayut_1();
     renderingLayut_2();
     renderingLayut_3();
     renderingLayut_4();
 }
 
-void CreateGameTableWindow::renderingLayut_1()
+void CreateGameTableTab::renderingLayut_1()
 {
     horizontalLayout = new QHBoxLayout();
 
@@ -58,18 +54,18 @@ void CreateGameTableWindow::renderingLayut_1()
     verticalLayout->addLayout(horizontalLayout);
 }
 
-void CreateGameTableWindow::renderingLayut_2()
+void CreateGameTableTab::renderingLayut_2()
 {
     horizontalLayout_2 = new QHBoxLayout();
 
-    label_2 = new QLabel(this);
+    label_2 = new QLabel();
     label_2->setText("Мин. ставка(руб.):");
     label_2->setFont(_fontLabel);
     horizontalLayout_2->addWidget(label_2);
 
     lineEdit = new QLineEdit(this);
     lineEdit->setFont(_fontBold);
-    lineEdit->setValidator(new QIntValidator(this));
+    lineEdit->setValidator(new QIntValidator());
     lineEdit->setMaximumWidth(100);
     lineEdit->setMaxLength(6);
     horizontalLayout_2->addWidget(lineEdit);
@@ -77,7 +73,7 @@ void CreateGameTableWindow::renderingLayut_2()
     verticalLayout->addLayout(horizontalLayout_2);
 }
 
-void CreateGameTableWindow::renderingLayut_3()
+void CreateGameTableTab::renderingLayut_3()
 {
     horizontalLayout_3= new QHBoxLayout();
 
@@ -89,7 +85,7 @@ void CreateGameTableWindow::renderingLayut_3()
     verticalLayout->addLayout(horizontalLayout_3);
 }
 
-void CreateGameTableWindow::renderingLayut_4()
+void CreateGameTableTab::renderingLayut_4()
 {
     QFont font;
     font.setFamily("Segoe UI");
@@ -111,13 +107,13 @@ void CreateGameTableWindow::renderingLayut_4()
     verticalLayout->addLayout(horizontalLayout_4);
 }
 
-void CreateGameTableWindow::connects()
+void CreateGameTableTab::connects()
 {
-    connect(create, &QPushButton::clicked, this, &CreateGameTableWindow::creating);
-    connect(selectGame, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CreateGameTableWindow::fillComboBoxNumPlayers);
+    connect(create, &QPushButton::clicked, this, &CreateGameTableTab::creating);
+    connect(selectGame, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CreateGameTableTab::fillComboBoxNumPlayers);
 }
 
-void CreateGameTableWindow::loadPlugins()
+void CreateGameTableTab::loadPlugins()
 {
     QDir dir("plugins/GamePlugins");
 
@@ -135,7 +131,7 @@ void CreateGameTableWindow::loadPlugins()
     fillComboBoxNumPlayers(selectGame->currentIndex());
 }
 
-void CreateGameTableWindow::addButtonGameStart(QObject* obj)
+void CreateGameTableTab::addButtonGameStart(QObject* obj)
 {
     if(!obj)
         return;
@@ -151,13 +147,12 @@ void CreateGameTableWindow::addButtonGameStart(QObject* obj)
     }
 }
 
-void CreateGameTableWindow::creating()
+void CreateGameTableTab::creating()
 {
     _games[selectGame->currentIndex()]->openGameWindow();
-    accept();
 }
 
-void CreateGameTableWindow::fillComboBoxNumPlayers(int index)
+void CreateGameTableTab::fillComboBoxNumPlayers(int index)
 {
     QVector<int> optionNumberOfPlayers;
     if (index >= 0 && index < _games.size())

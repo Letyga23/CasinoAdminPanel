@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QSqlError>
 #include <QRandomGenerator>
-#include "mainwindow.h"
+#include "adminpanelwindow.h"
 
 QMutex MyThread::_searchMutex;
 bool MyThread::_resultIsFound = false;

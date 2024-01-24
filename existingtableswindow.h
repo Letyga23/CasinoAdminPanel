@@ -1,7 +1,7 @@
 ﻿#ifndef EXISTINGTABLESWINDOW_H
 #define EXISTINGTABLESWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QDebug>
 #include <QMessageBox>
 #include <QTableView>
@@ -31,10 +31,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-class ExistingTablesWindow : public QMainWindow
+class ExistingTablesWindow : public QWidget
 {
-    Q_OBJECT
-
     int _currentPage;
     int _rowsPerPage;
     int _maxPageModel;
@@ -64,8 +62,6 @@ class ExistingTablesWindow : public QMainWindow
     QString _tableWorkInDB;
 
 private:
-    QWidget* _centralwidget;
-
     QLabel* _labelSearch;
     QLabel* _labelGoToPageNum;
     QLabel* _labelSelectPage;
@@ -122,7 +118,7 @@ private:
     QString _pushButtonStyleSheet;
 
 public:
-    ExistingTablesWindow(QWidget* parent = nullptr);
+    ExistingTablesWindow(QStatusBar* statusBar);
     ~ExistingTablesWindow();
 
 private:

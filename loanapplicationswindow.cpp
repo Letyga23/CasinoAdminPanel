@@ -1,10 +1,10 @@
 ﻿#include "loanapplicationswindow.h"
-#include "mainwindow.h"
+#include "adminpanelwindow.h"
 
 QMutex loanApplications_mutex;
 
-LoanApplicationsWindow::LoanApplicationsWindow(QWidget *parent)
-    : QMainWindow(parent)
+LoanApplicationsWindow::LoanApplicationsWindow(QStatusBar *statusBar)
+    : _statusBar(statusBar)
 {
     assigningValues();
     creatingObjects();
@@ -17,7 +17,7 @@ LoanApplicationsWindow::LoanApplicationsWindow(QWidget *parent)
 
 LoanApplicationsWindow::~LoanApplicationsWindow()
 {
-    delete _centralwidget;
+    delete this;
 }
 
 void LoanApplicationsWindow::assigningValues()
@@ -83,7 +83,7 @@ void LoanApplicationsWindow::assigningValues()
 
 void LoanApplicationsWindow::workingWithTableView()
 {
-    _tableView = new QTableView(_centralwidget);
+    _tableView = new QTableView(this);
     _tableView->setFont(_font2);
     _tableView->setStyleSheet("selection-background-color: rgb(42, 117, 255);");
     _tableView->setWordWrap(false);
@@ -172,8 +172,7 @@ void LoanApplicationsWindow::renderingInterface()
     resize(1000, 656);
     setWindowTitle("Заявки на кредиты");
 
-    _centralwidget = new QWidget(this);
-    _verticalLayout = new QVBoxLayout(_centralwidget);
+    _verticalLayout = new QVBoxLayout(this);
 
     renderingLayout_1();
     renderingLayout_2();
@@ -181,10 +180,6 @@ void LoanApplicationsWindow::renderingInterface()
     renderingLayout_3();
     renderingLayout_4();
     renderingLayout_5();
-
-    setCentralWidget(_centralwidget);
-    _statusBar = new QStatusBar(this);
-    setStatusBar(_statusBar);
 
     QList<QComboBox*> comboBoxs = findChildren<QComboBox*>();
     for(QComboBox* comboBox : comboBoxs)
@@ -195,34 +190,34 @@ void LoanApplicationsWindow::renderingLayout_1()
 {
     _horizontalLayout = new QHBoxLayout();
 
-    _labelSearch = new QLabel(_centralwidget);
+    _labelSearch = new QLabel(this);
     _labelSearch->setFont(_font1);
     _labelSearch->setText("Поиск:");
     _horizontalLayout->addWidget(_labelSearch);
 
-    _searchColumn = new QComboBox(_centralwidget);
+    _searchColumn = new QComboBox(this);
     _searchColumn->addItem("Имя");
     _searchColumn->addItem("Фамилия");
     _searchColumn->setFont(_font1);
     _horizontalLayout->addWidget(_searchColumn);
 
-    _searchText = new QLineEdit(_centralwidget);
+    _searchText = new QLineEdit(this);
     _searchText->setFont(_font1);
     _horizontalLayout->addWidget(_searchText);
 
-    _checkBox = new QCheckBox(_centralwidget);
+    _checkBox = new QCheckBox(this);
     _checkBox->setFont(_font2);
     _checkBox->setText("Точное \nсовпадение");
     _horizontalLayout->addWidget(_checkBox);
 
-    _pushButton_search = new QPushButton(_centralwidget);
+    _pushButton_search = new QPushButton(this);
     _pushButton_search->setFont(_font2);
     _pushButton_search->setIcon(QIcon(":/assets/поиск.png"));
     _pushButton_search->setIconSize(QSize(32, 32));
     _pushButton_search->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout->addWidget(_pushButton_search);
 
-    _clearSearch = new QPushButton(_centralwidget);
+    _clearSearch = new QPushButton(this);
     _clearSearch->setFont(_font2);
     _clearSearch->setIcon(QIcon(":/assets/очистить поиск.png"));
     _clearSearch->setIconSize(QSize(32, 32));
@@ -232,14 +227,14 @@ void LoanApplicationsWindow::renderingLayout_1()
     _horizontalSpacer_6 = new QSpacerItem(209, 20);
     _horizontalLayout->addItem(_horizontalSpacer_6);
 
-    _addFilter = new QPushButton(_centralwidget);
+    _addFilter = new QPushButton(this);
     _addFilter->setFont(_font2);
     _addFilter->setIcon(QIcon(":/assets/добавить фильтр.png"));
     _addFilter->setIconSize(QSize(32, 32));
     _addFilter->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout->addWidget(_addFilter);
 
-    _clearFilter = new QPushButton(_centralwidget);
+    _clearFilter = new QPushButton(this);
     _clearFilter->setFont(_font2);
     _clearFilter->setIcon(QIcon(":/assets/сбросить фильтр.png"));
     _clearFilter->setIconSize(QSize(32, 32));
@@ -253,23 +248,23 @@ void LoanApplicationsWindow::renderingLayout_2()
 {
     _horizontalLayout_2 = new QHBoxLayout();
 
-    _labelSortColumn = new QLabel(_centralwidget);
+    _labelSortColumn = new QLabel(this);
     _labelSortColumn->setFont(_font2);
     _labelSortColumn->setText("Сортировать столбец:");
     _horizontalLayout_2->addWidget(_labelSortColumn);
 
-    _sortingColumn = new QComboBox(_centralwidget);
+    _sortingColumn = new QComboBox(this);
     _sortingColumn->addItem("Имя");
     _sortingColumn->addItem("Фамилия");
     _sortingColumn->setFont(_font1);
     _horizontalLayout_2->addWidget(_sortingColumn);
 
-    _label_6 = new QLabel(_centralwidget);
+    _label_6 = new QLabel(this);
     _label_6->setFont(_font2);
     _label_6->setText("по");
     _horizontalLayout_2->addWidget(_label_6);
 
-    _typeSorting = new QComboBox(_centralwidget);
+    _typeSorting = new QComboBox(this);
     _typeSorting->addItem("Возрастанию (А-Я)");
     _typeSorting->addItem("Убыванию (Я-А)");
     _typeSorting->setFont(_font1);
@@ -278,7 +273,7 @@ void LoanApplicationsWindow::renderingLayout_2()
     _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding);
     _horizontalLayout_2->addItem(_horizontalSpacer);
 
-    _resetTable = new QPushButton(_centralwidget);
+    _resetTable = new QPushButton(this);
     _resetTable->setFont(_font2);
     _resetTable->setText("Сбросить \nрезультат");
     _resetTable->setStyleSheet(_pushButtonStyleSheet);
@@ -294,22 +289,22 @@ void LoanApplicationsWindow::renderingLayout_3()
     _horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     _horizontalLayout_3->addItem(_horizontalSpacer_5);
 
-    _labelSelectPage = new QLabel(_centralwidget);
+    _labelSelectPage = new QLabel(this);
     _labelSelectPage->setFont(_font2);
     _labelSelectPage->setText("Текущая страница:");
     _horizontalLayout_3->addWidget(_labelSelectPage);
 
-    _labelCurrentPage = new QLabel(_centralwidget);
+    _labelCurrentPage = new QLabel(this);
     _labelCurrentPage->setFont(_font1);
     _labelCurrentPage->setText("0");
     _horizontalLayout_3->addWidget(_labelCurrentPage);
 
-    _label_5 = new QLabel(_centralwidget);
+    _label_5 = new QLabel(this);
     _label_5->setFont(_font2);
     _label_5->setText("/");
     _horizontalLayout_3->addWidget(_label_5);
 
-    _labelMaxPage = new QLabel(_centralwidget);
+    _labelMaxPage = new QLabel(this);
     _labelMaxPage->setFont(_font1);
     _labelMaxPage->setText("????");
     _horizontalLayout_3->addWidget(_labelMaxPage);
@@ -328,7 +323,7 @@ void LoanApplicationsWindow::renderingLayout_4()
 
     _horizontalLayout_4 = new QHBoxLayout();
 
-    _prevButton = new QPushButton(_centralwidget);
+    _prevButton = new QPushButton(this);
     _prevButton->setFont(font);
     _prevButton->setText("<<");
     _prevButton->setStyleSheet(_pushButtonStyleSheet);
@@ -337,12 +332,12 @@ void LoanApplicationsWindow::renderingLayout_4()
     _horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     _horizontalLayout_4->addItem(_horizontalSpacer_2);
 
-    _labelGoToPageNum = new QLabel(_centralwidget);
+    _labelGoToPageNum = new QLabel(this);
     _labelGoToPageNum->setFont(_font2);
     _labelGoToPageNum->setText("Перейти к странице №:");
     _horizontalLayout_4->addWidget(_labelGoToPageNum);
 
-    _pageNumberToNavigate = new QLineEdit(_centralwidget);
+    _pageNumberToNavigate = new QLineEdit(this);
     _pageNumberToNavigate->setFont(_font2);
     _pageNumberToNavigate->setValidator(new QIntValidator);
     _pageNumberToNavigate->setMaximumWidth(35);
@@ -351,7 +346,7 @@ void LoanApplicationsWindow::renderingLayout_4()
     _horizontalSpacer_3 = new QSpacerItem(70, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
     _horizontalLayout_4->addItem(_horizontalSpacer_3);
 
-    _nextButton = new QPushButton(_centralwidget);
+    _nextButton = new QPushButton(this);
     _nextButton->setFont(font);
     _nextButton->setText(">>");
     _nextButton->setStyleSheet(_pushButtonStyleSheet);
@@ -374,7 +369,7 @@ void LoanApplicationsWindow::renderingLayout_5()
     int tact = 5;
     for(int num = 10; num <= 20; num += tact)
     {
-         QPushButton* numberRows = new QPushButton(_centralwidget);
+         QPushButton* numberRows = new QPushButton(this);
          numberRows->setFont(font);
          numberRows->setText(QString::number(num));
          numberRows->setObjectName("_numberRows_" + QString::number(num));
@@ -591,12 +586,12 @@ void LoanApplicationsWindow::goToPrevModel()
 
 void LoanApplicationsWindow::blockingInterface(bool flag)
 {
-    QList<QPushButton*> pushbuttons = _centralwidget->findChildren<QPushButton*>();
+    QList<QPushButton*> pushbuttons = this->findChildren<QPushButton*>();
     for(QPushButton* pushbutton : pushbuttons)
         pushbutton->setEnabled(flag);
 
 
-    QList<QComboBox*> comboBoxs = _centralwidget->findChildren<QComboBox*>();
+    QList<QComboBox*> comboBoxs = this->findChildren<QComboBox*>();
     for(QComboBox* comboBox : comboBoxs)
         comboBox->setEnabled(flag);
 
@@ -768,9 +763,9 @@ void LoanApplicationsWindow::setValueToMaxPage(int maxPage)
 
 void LoanApplicationsWindow::closeEvent(QCloseEvent* event)
 {
-    QMainWindow::closeEvent(event);
+    QWidget::closeEvent(event);
 
-    MainWindow* w = new MainWindow();
+    AdminPanelWindow* w = new AdminPanelWindow();
     w->show();
 }
 
