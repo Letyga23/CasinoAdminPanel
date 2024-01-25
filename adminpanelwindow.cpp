@@ -3,6 +3,8 @@
 AdminPanelWindow::AdminPanelWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    _role = "Администратор";
+
     renderingInterface();
     connects();
 }
@@ -15,7 +17,7 @@ AdminPanelWindow::~AdminPanelWindow()
 void AdminPanelWindow::renderingInterface()
 {
     setWindowTitle("Админ панель");
-    resize(1100, 700);
+    resize(1100, 750);
 
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     sizePolicy.setHorizontalStretch(0);
@@ -33,6 +35,7 @@ void AdminPanelWindow::renderingInterface()
     _verticalLayout_Main->addWidget(_tabWidget);
 
     _statusBar = new QStatusBar();
+    _statusBar->showMessage(_role);
     setStatusBar(_statusBar);
 
     setCentralWidget(_mainWidget);
@@ -51,13 +54,13 @@ void AdminPanelWindow::rendering_Tab_1()
 
 void AdminPanelWindow::rendering_Tab_2()
 {
-    _tab2_Widget = new ExistingTablesWindow(_statusBar);
+    _tab2_Widget = new ExistingTablesWindow();
     _tabWidget->addTab(_tab2_Widget, "Страница 2");
 }
 
 void AdminPanelWindow::rendering_Tab_3()
 {
-    _tab3_Widget = new LoanApplicationsWindow(_statusBar);
+    _tab3_Widget = new LoanApplicationsWindow();
     _tabWidget->addTab(_tab3_Widget, "Страница 3");
 }
 

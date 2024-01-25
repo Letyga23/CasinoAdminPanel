@@ -3,8 +3,7 @@
 
 QMutex loanApplications_mutex;
 
-LoanApplicationsWindow::LoanApplicationsWindow(QStatusBar *statusBar)
-    : _statusBar(statusBar)
+LoanApplicationsWindow::LoanApplicationsWindow()
 {
     assigningValues();
     creatingObjects();
@@ -170,7 +169,6 @@ void LoanApplicationsWindow::connects()
 void LoanApplicationsWindow::renderingInterface()
 {
     resize(1000, 656);
-    setWindowTitle("Заявки на кредиты");
 
     _verticalLayout = new QVBoxLayout(this);
 
@@ -180,6 +178,7 @@ void LoanApplicationsWindow::renderingInterface()
     renderingLayout_3();
     renderingLayout_4();
     renderingLayout_5();
+    renderingLayout_6();
 
     QList<QComboBox*> comboBoxs = findChildren<QComboBox*>();
     for(QComboBox* comboBox : comboBoxs)
@@ -385,6 +384,20 @@ void LoanApplicationsWindow::renderingLayout_5()
     _verticalLayout->addLayout(_horizontalLayout_5);
 }
 
+void LoanApplicationsWindow::renderingLayout_6()
+{
+    _horizontalLayout_6 = new QHBoxLayout();
+
+    _status = new QLabel();
+    _horizontalLayout_6->addWidget(_status);
+
+    _horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    _horizontalLayout_6->addItem(_horizontalSpacer_9);
+
+    _verticalLayout->addLayout(_horizontalLayout_6);
+}
+
+
 void LoanApplicationsWindow::searchInDB()
 {
     int totalRowCount = _maxPage * _rowsPerPage;
@@ -411,7 +424,7 @@ void LoanApplicationsWindow::searchInDB()
 
 void LoanApplicationsWindow::initializationStartModel()
 {
-    _statusBar->showMessage("Идёт загрузка данных...");
+    _status->setText("Идёт загрузка данных...");
     _tableView->setModel(nullptr);
 
     int setPages = _currentPage - currentPageInModel();
@@ -433,7 +446,7 @@ void LoanApplicationsWindow::loadingModel(QSharedPointer<MyThread> thread, QShar
 void LoanApplicationsWindow::startLoadModelFinished()
 {
     blockingInterface(true);
-    _statusBar->clearMessage();
+    _status->clear();
     setModel(_models[0]);
 
     if(!_like.isEmpty())

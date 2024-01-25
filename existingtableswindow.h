@@ -70,6 +70,7 @@ private:
     QLabel* _label_6;
     QLabel* _labelCurrentPage;
     QLabel* _labelMaxPage;
+    QLabel* _status;
 
     QVBoxLayout* _verticalLayout;
 
@@ -78,6 +79,7 @@ private:
     QHBoxLayout* _horizontalLayout_3;
     QHBoxLayout* _horizontalLayout_4;
     QHBoxLayout* _horizontalLayout_5;
+    QHBoxLayout* _horizontalLayout_6;
 
     QComboBox* _searchColumn;
     QComboBox* _sortingColumn;
@@ -106,10 +108,9 @@ private:
     QSpacerItem* _horizontalSpacer_6;
     QSpacerItem* _horizontalSpacer_7;
     QSpacerItem* _horizontalSpacer_8;
+    QSpacerItem* _horizontalSpacer_9;
 
     QTableView* _tableView;
-
-    QStatusBar* _statusBar;
 
     QFont _font1;
     QFont _font2;
@@ -118,7 +119,7 @@ private:
     QString _pushButtonStyleSheet;
 
 public:
-    ExistingTablesWindow(QStatusBar* statusBar);
+    ExistingTablesWindow();
     ~ExistingTablesWindow();
 
 private:
@@ -149,6 +150,7 @@ private:
     void renderingLayout_3();
     void renderingLayout_4();
     void renderingLayout_5();
+    void renderingLayout_6();
     void blockAndOperate(QObject* widget, const std::function<void()>& operation);
     void setValueToMaxPage(int maxPage);
     void closeEvent(QCloseEvent* event) override;

@@ -3,8 +3,7 @@
 
 QMutex existingTables_Mutex;
 
-ExistingTablesWindow::ExistingTablesWindow(QStatusBar* statusBar)
-    : _statusBar(statusBar)
+ExistingTablesWindow::ExistingTablesWindow()
 {
     assigningValues();
     creatingObjects();
@@ -169,8 +168,6 @@ void ExistingTablesWindow::connects()
 
 void ExistingTablesWindow::renderingInterface()
 {
-    setWindowTitle("Существующие столы");
-
     _verticalLayout = new QVBoxLayout(this);
 
     renderingLayout_1();
@@ -179,6 +176,7 @@ void ExistingTablesWindow::renderingInterface()
     renderingLayout_3();
     renderingLayout_4();
     renderingLayout_5();
+    renderingLayout_6();
 
     QList<QComboBox*> comboBoxs = findChildren<QComboBox*>();
     for(QComboBox* comboBox : comboBoxs)
@@ -379,10 +377,24 @@ void ExistingTablesWindow::renderingLayout_5()
     _numberRows[0]->setStyleSheet(_pushButtonStyleSheet);
 
     _horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_5->addItem(_horizontalSpacer_7);
+    _horizontalLayout_5->addItem(_horizontalSpacer_8);
 
     _verticalLayout->addLayout(_horizontalLayout_5);
 }
+
+void ExistingTablesWindow::renderingLayout_6()
+{
+    _horizontalLayout_6 = new QHBoxLayout();
+
+    _status = new QLabel();
+    _horizontalLayout_6->addWidget(_status);
+
+    _horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    _horizontalLayout_6->addItem(_horizontalSpacer_9);
+
+    _verticalLayout->addLayout(_horizontalLayout_6);
+}
+
 
 void ExistingTablesWindow::searchInDB()
 {
@@ -410,7 +422,7 @@ void ExistingTablesWindow::searchInDB()
 
 void ExistingTablesWindow::initializationStartModel()
 {
-    _statusBar->showMessage("Идёт загрузка данных...");
+    _status->setText("Идёт загрузка данных...");
     _tableView->setModel(nullptr);
 
     int setPages = _currentPage - currentPageInModel();
@@ -432,7 +444,7 @@ void ExistingTablesWindow::loadingModel(QSharedPointer<MyThread> thread, QShared
 void ExistingTablesWindow::startLoadModelFinished()
 {
     blockingInterface(true);
-    _statusBar->clearMessage();
+    _status->clear();
     setModel(_models[0]);
 
     if(!_like.isEmpty())

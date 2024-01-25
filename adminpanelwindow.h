@@ -10,8 +10,11 @@ class AdminPanelWindow : public QMainWindow
 {
     Q_OBJECT
 
+    QString _role;
+
 private:
     QWidget* _mainWidget;
+
     CreateGameTableTab* _tab1_Widget;
     ExistingTablesWindow* _tab2_Widget;
     LoanApplicationsWindow* _tab3_Widget;
