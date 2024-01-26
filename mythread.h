@@ -17,7 +17,6 @@ class MyThread : public QThread
     std::function<void()> _task;
     QSharedPointer<QSqlDatabase> _db;
     QSharedPointer<QSqlQueryModel> _query;
-    QAtomicInt _atomicFlag;
 
 public:
     QMutex _runThreadMutex;
@@ -25,8 +24,6 @@ public:
     static bool _resultIsFound;
 
 public:
-
-
     MyThread(QObject* parent = nullptr);
     ~MyThread() override;
     void setTask(std::function<void()> task);

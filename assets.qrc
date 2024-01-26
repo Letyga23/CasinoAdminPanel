@@ -4,5 +4,7 @@
         <file>assets/поиск.png</file>
         <file>assets/добавить фильтр.png</file>
         <file>assets/сбросить фильтр.png</file>
+        <file>assets/пароль открыт.png</file>
+        <file>assets/пароль спрятан.png</file>
     </qresource>
 </RCC>

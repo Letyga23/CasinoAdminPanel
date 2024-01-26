@@ -2,9 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "existingtableswindow.h"
-#include "loanapplicationswindow.h"
-#include "creategametablewindow.h"
+#include "existingtables.h"
+#include "loanapplications.h"
+#include "creategametable.h"
 
 class AdminPanelWindow : public QMainWindow
 {
@@ -29,7 +29,7 @@ private:
     QTabWidget* _tabWidget;
 
 public:
-    AdminPanelWindow(QWidget *parent = nullptr);
+    AdminPanelWindow(QString role = "", QWidget *parent = nullptr);
     ~AdminPanelWindow();
 
 private:

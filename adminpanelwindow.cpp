@@ -1,9 +1,9 @@
 ﻿#include "adminpanelwindow.h"
 
-AdminPanelWindow::AdminPanelWindow(QWidget *parent)
+AdminPanelWindow::AdminPanelWindow(QString role, QWidget *parent)
     : QMainWindow(parent)
 {
-    _role = "Администратор";
+    _role = role;
 
     renderingInterface();
     connects();

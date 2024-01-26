@@ -17,20 +17,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     adminpanelwindow.cpp \
-    creategametablewindow.cpp \
-    existingtableswindow.cpp \
+    creategametable.cpp \
+    existingtables.cpp \
     filterdialog.cpp \
-    loanapplicationswindow.cpp \
+    loanapplications.cpp \
+    loginform.cpp \
     main.cpp \
     mythread.cpp
 
 HEADERS += \
     adminpanelwindow.h \
-    creategametablewindow.h \
-    existingtableswindow.h \
+    creategametable.h \
+    existingtables.h \
     filterdialog.h \
     gamePluginInterface.h \
-    loanapplicationswindow.h \
+    loanapplications.h \
+    loginform.h \
     mythread.h
 
 # Default rules for deployment.
