@@ -10,8 +10,6 @@ ExistingTablesWindow::ExistingTablesWindow()
 
     renderingInterface();
     connects();
-
-    refreshStartModel();
 }
 
 ExistingTablesWindow::~ExistingTablesWindow()
@@ -373,6 +371,13 @@ void ExistingTablesWindow::renderingLayout_5()
          _horizontalLayout_5->addWidget(numberRows);
          _numberRows.push_back(numberRows);
     }
+
+    _automaticNumberRows = new QPushButton(this);
+    _automaticNumberRows->setFont(font);
+    _automaticNumberRows->setText("Авто");
+    _automaticNumberRows->setObjectName("_automaticNumberRows");
+    _horizontalLayout_5->addWidget(_automaticNumberRows);
+    _numberRows.push_back(_automaticNumberRows);
 
     _numberRows[0]->setStyleSheet(_pushButtonStyleSheet);
 
@@ -771,19 +776,45 @@ void ExistingTablesWindow::setValueToMaxPage(int maxPage)
     _labelMaxPage->setText(QString::number(_maxPage));
 }
 
-void ExistingTablesWindow::closeEvent(QCloseEvent* event)
+void ExistingTablesWindow::resizeEvent(QResizeEvent* event)
 {
-    QWidget::closeEvent(event);
+    QWidget::resizeEvent(event);
 
-    AdminPanelWindow* w = new AdminPanelWindow();
-    w->show();
+    if(_autoNumRows)
+        automaticNumberRows();
+}
+
+void ExistingTablesWindow::automaticNumberRows()
+{
+    if(_tableView->model())
+    {
+        int visibleHeight = _tableView->viewport()->height();
+        int rowHeight = _tableView->verticalHeader()->defaultSectionSize();
+
+        _rowsPerPage = visibleHeight / rowHeight;
+        refreshStartModel();
+    }
 }
 
 void ExistingTablesWindow::changeNumberRows()
 {
     QPushButton* button = (QPushButton*)sender();
-    QStringList nums;
-    nums = button->objectName().split('_');
+
+    for(QPushButton* buttonNum : _numberRows)
+        buttonNum->setStyleSheet("");
+
+    button->setStyleSheet(_pushButtonStyleSheet);
+
+    if(button->objectName() == "_automaticNumberRows")
+    {
+        _autoNumRows = true;
+        automaticNumberRows();
+        return;
+    }
+    else
+        _autoNumRows = false;
+
+    QStringList nums = button->objectName().split('_');
 
     if (nums.size() >= 3)
         QString num = nums[2];
@@ -800,10 +831,11 @@ void ExistingTablesWindow::changeNumberRows()
 
     _rowsPerPage = num;
 
-    for(QPushButton* buttonNum : _numberRows)
-        buttonNum->setStyleSheet("");
+    refreshStartModel();
+}
 
-    button->setStyleSheet(_pushButtonStyleSheet);
-
+void ExistingTablesWindow::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
     refreshStartModel();
 }

@@ -43,7 +43,6 @@ void AdminPanelWindow::renderingInterface()
     rendering_Tab_1();
     rendering_Tab_2();
     rendering_Tab_3();
-
 }
 
 void AdminPanelWindow::rendering_Tab_1()

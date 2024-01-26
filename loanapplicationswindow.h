@@ -63,6 +63,8 @@ class LoanApplicationsWindow : public QWidget
 
     QString _tableWorkInDB;
 
+    bool _autoNumRows;
+
 private:
     QLabel* _labelSearch;
     QLabel* _labelGoToPageNum;
@@ -99,6 +101,7 @@ private:
     QPushButton* _resetTable;
     QPushButton* _prevButton;
     QPushButton* _nextButton;
+    QPushButton* _automaticNumberRows;
 
     QVector<QPushButton*> _numberRows;
 
@@ -155,7 +158,9 @@ private:
     void renderingLayout_6();
     void blockAndOperate(QObject* widget, const std::function<void()>& operation);
     void setValueToMaxPage(int maxPage);
-    void closeEvent(QCloseEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
+    void automaticNumberRows();
+    void showEvent(QShowEvent* event) override;
 
 private slots:
     void on_clearSearch_clicked();
