@@ -100,6 +100,7 @@ private:
     QPushButton* _prevButton;
     QPushButton* _nextButton;
     QPushButton* _automaticNumberRows;
+    QPushButton* _moreDetailed;
 
     QVector<QPushButton*> _numberRows;
 
@@ -173,5 +174,6 @@ private slots:
     void on_pushButton_search_clicked();
     void onHeaderClicked(int logicalIndex);
     void changeNumberRows();
+    void openMoreDetailed();
 };
 #endif // EXISTINGTABLESWINDOW_H

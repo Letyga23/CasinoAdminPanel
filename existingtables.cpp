@@ -133,11 +133,7 @@ void ExistingTablesWindow::connects()
     connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTablesWindow::refreshStartModel);
     connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTablesWindow::refreshStartModel);
 
-    connect(&_searchTimer, &QTimer::timeout, this, [=]()
-    {
-        if(!_searchText->text().isEmpty())
-            searchInModels();
-    });
+    connect(&_searchTimer, &QTimer::timeout, this, &ExistingTablesWindow::searchInModels);
 
     connect(&_goToPageTimer, &QTimer::timeout, this, [=]()
     {
@@ -157,6 +153,7 @@ void ExistingTablesWindow::connects()
     connect(_resetTable, &QPushButton::clicked, this, &ExistingTablesWindow::on_resetTable_clicked);
     connect(_nextButton, &QPushButton::clicked, this, &ExistingTablesWindow::on_nextButton_clicked);
     connect(_prevButton, &QPushButton::clicked, this, &ExistingTablesWindow::on_prevButton_clicked);
+    connect(_moreDetailed, &QPushButton::clicked, this, &ExistingTablesWindow::openMoreDetailed);
 
     for(QPushButton* buttonNum : _numberRows)
         connect(buttonNum, &QPushButton::clicked, this, &ExistingTablesWindow::changeNumberRows);
@@ -270,6 +267,12 @@ void ExistingTablesWindow::renderingLayout_2()
 
     _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding);
     _horizontalLayout_2->addItem(_horizontalSpacer);
+
+    _moreDetailed = new QPushButton(this);
+    _moreDetailed->setFont(_font1);
+    _moreDetailed->setText("Подробнее");
+    _moreDetailed->setStyleSheet(_pushButtonStyleSheet);
+    _horizontalLayout_2->addWidget(_moreDetailed);
 
     _resetTable = new QPushButton(this);
     _resetTable->setFont(_font2);
@@ -424,7 +427,7 @@ void ExistingTablesWindow::searchInDB()
             else if (i == (numThreads - 1))
                 QMessageBox::warning(this, "Внимание", "Данных нет!", QMessageBox::Ok);
         });
-        searchTask->search(_tableWorkInDB, _column, _like, _typeSearch, _filter, _sort, limit, offset);
+        searchTask->search(_tableWorkInDB, _column, _like, _typeSearch, _filter, _sort, limit, offset, _rowsPerPage);
     }
 }
 
@@ -672,6 +675,9 @@ int ExistingTablesWindow::currentPageInModel()
 
 void ExistingTablesWindow::searchInModels()
 {
+    if(_searchText->text().isEmpty())
+        return;
+
     bool resultSearchInModel = false;
     _like = _searchText->text();
     _column = _searchColumn->currentText();
@@ -835,5 +841,9 @@ void ExistingTablesWindow::changeNumberRows()
     _rowsPerPage = num;
 
     refreshStartModel();
+}
+
+void ExistingTablesWindow::openMoreDetailed()
+{
 
 }

@@ -89,7 +89,7 @@ void MyThread::getMaxPage(QString nameTable, int rowsPerPage, QString filters)
     start();
 }
 
-void MyThread::search(QString nameTable, QString column, QString like, QString typeSearch, QString filters, QString sort, int limit, int offset)
+void MyThread::search(QString nameTable, QString column, QString like, QString typeSearch, QString filters, QString sort, int limit, int offset, int rowsPerPage)
 {
     setTask([=]()
     {
@@ -109,7 +109,7 @@ void MyThread::search(QString nameTable, QString column, QString like, QString t
                 QMutexLocker locker(&_searchMutex);
                 _resultIsFound = true;
                 double row = _query->data(_query->index(0, 0)).toDouble();
-                currentPage = static_cast<int>(std::ceil(row / 10));
+                currentPage = static_cast<int>(std::ceil(row / rowsPerPage));
             }
 
             _db->close();
