@@ -23,7 +23,8 @@ SOURCES += \
     loanapplications.cpp \
     loginform.cpp \
     main.cpp \
-    mythread.cpp
+    mythread.cpp \
+    role.cpp
 
 HEADERS += \
     adminpanelwindow.h \
@@ -33,7 +34,8 @@ HEADERS += \
     gamePluginInterface.h \
     loanapplications.h \
     loginform.h \
-    mythread.h
+    mythread.h \
+    role.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

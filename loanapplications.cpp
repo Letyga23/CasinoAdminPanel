@@ -10,11 +10,12 @@ LoanApplicationsWindow::LoanApplicationsWindow()
 
     renderingInterface();
     connects();
+    refreshStartModel();
 }
 
 LoanApplicationsWindow::~LoanApplicationsWindow()
 {
-    delete this;
+    delete _verticalLayout;
 }
 
 void LoanApplicationsWindow::assigningValues()
@@ -26,6 +27,8 @@ void LoanApplicationsWindow::assigningValues()
     _typeSearch = "%";
 
     _tableWorkInDB = "name_pred";
+
+    _autoNumRows = false;
 
     _typeSort =
     {
@@ -834,11 +837,5 @@ void LoanApplicationsWindow::changeNumberRows()
 
     _rowsPerPage = num;
 
-    refreshStartModel();
-}
-
-void LoanApplicationsWindow::showEvent(QShowEvent* event)
-{
-    QWidget::showEvent(event);
     refreshStartModel();
 }

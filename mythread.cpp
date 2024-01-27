@@ -46,14 +46,14 @@ void MyThread::completion(QSharedPointer<QSqlQueryModel> model, QString nameTabl
         _db->open();
 
         QString filterLimit = QString(" LIMIT %1 OFFSET %2").arg(limit).arg(offset);
-        QString request("CREATE TEMPORARY TABLE temp_table AS SELECT ROW_NUMBER() OVER () AS №, sorted_data.* FROM "
+        QString request("CREATE TEMPORARY TABLE temp_" + nameTable + " AS SELECT ROW_NUMBER() OVER () AS №, sorted_data.* FROM "
                         "(SELECT * FROM " + nameTable + " ORDER BY " + sort + ") AS sorted_data WHERE 1=1" + filters + filterLimit);
 
         _query->setQuery(request, *_db);
 
         if (!_query->lastError().isValid())
         {
-            QString zapros = "SELECT * FROM temp_table;";
+            QString zapros = "SELECT * FROM temp_" + nameTable;
             model->setQuery(zapros, *_db);
             emit completedSuccessfully();
         }

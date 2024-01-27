@@ -14,7 +14,10 @@ CreateGameTableTab::CreateGameTableTab()
 
 CreateGameTableTab::~CreateGameTableTab()
 {
-    delete this;
+    qDeleteAll(_games);
+    _games.clear();
+
+    delete verticalLayout;
 }
 
 void CreateGameTableTab::renderingInterface()

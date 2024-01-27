@@ -1,10 +1,11 @@
 ﻿#include "adminpanelwindow.h"
 
-AdminPanelWindow::AdminPanelWindow(QString role, QWidget *parent)
+AdminPanelWindow::AdminPanelWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    _role = role;
+    _role = Role::getRoleString();
 
+    creatingObjects();
     renderingInterface();
     connects();
 }
@@ -32,6 +33,7 @@ void AdminPanelWindow::renderingInterface()
     _verticalLayout_Main = new QVBoxLayout(_mainWidget);
 
     _tabWidget = new QTabWidget;
+    _tabWidget->tabBar()->hide();
     _verticalLayout_Main->addWidget(_tabWidget);
 
     _statusBar = new QStatusBar();
@@ -40,30 +42,70 @@ void AdminPanelWindow::renderingInterface()
 
     setCentralWidget(_mainWidget);
 
-    rendering_Tab_1();
-    rendering_Tab_2();
-    rendering_Tab_3();
+    rendering_CreateGameTableTab();
+    rendering_ExistingTablesTab();
+    rendering_LoanApplicationsTab();
+    rendering_ToolBar();
 }
 
-void AdminPanelWindow::rendering_Tab_1()
+void AdminPanelWindow::rendering_CreateGameTableTab()
 {
-    _tab1_Widget = new CreateGameTableTab();
-    _tabWidget->addTab(_tab1_Widget, "Страница 1");
+    _createGameTableTab = new CreateGameTableTab();
+    _tabWidget->addTab(_createGameTableTab, "");
 }
 
-void AdminPanelWindow::rendering_Tab_2()
+void AdminPanelWindow::rendering_ExistingTablesTab()
 {
-    _tab2_Widget = new ExistingTablesWindow();
-    _tabWidget->addTab(_tab2_Widget, "Страница 2");
+    _existingTablesTab = new ExistingTablesWindow();
+    _tabWidget->addTab(_existingTablesTab, "");
 }
 
-void AdminPanelWindow::rendering_Tab_3()
+void AdminPanelWindow::rendering_LoanApplicationsTab()
 {
-    _tab3_Widget = new LoanApplicationsWindow();
-    _tabWidget->addTab(_tab3_Widget, "Страница 3");
+    _loanApplicationsTab = new LoanApplicationsWindow();
+    _tabWidget->addTab(_loanApplicationsTab, "");
+}
+
+void AdminPanelWindow::rendering_ToolBar()
+{
+    _toolBar = new QToolBar;
+    addToolBar(_toolBar);
+
+    _toolBar->addAction(_openCreateTable);
+    _toolBar->addAction(_openExistingTable);
+    _toolBar->addAction(_openLoanAplications);
 }
 
 void AdminPanelWindow::connects()
 {
+    connect(_openCreateTable, &QAction::triggered, this, &AdminPanelWindow::openCreateTable);
+    connect(_openExistingTable, &QAction::triggered, this, &AdminPanelWindow::openExistingTable);
+    connect(_openLoanAplications, &QAction::triggered, this, &AdminPanelWindow::openLoanAplications);
+}
 
+void AdminPanelWindow::creatingObjects()
+{
+    _openCreateTable = new QAction;
+    _openCreateTable->setText("Создать стол");
+
+    _openExistingTable = new QAction;
+    _openExistingTable->setText("Существующие столы");
+
+    _openLoanAplications = new QAction;
+    _openLoanAplications->setText("Заявки на кредиты");
+}
+
+void AdminPanelWindow::openCreateTable()
+{
+    _tabWidget->setCurrentWidget(_createGameTableTab);
+}
+
+void AdminPanelWindow::openExistingTable()
+{
+    _tabWidget->setCurrentWidget(_existingTablesTab);
+}
+
+void AdminPanelWindow::openLoanAplications()
+{
+    _tabWidget->setCurrentWidget(_loanApplicationsTab);
 }

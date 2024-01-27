@@ -15,7 +15,7 @@ class CreateGameTableTab : public QWidget
     QMap<int, GamePluginInterface*> _games;
 
 private:
-    QVBoxLayout *verticalLayout;
+    QVBoxLayout* verticalLayout;
 
     QLabel *label;
     QLabel *label_2;

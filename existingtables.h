@@ -158,7 +158,6 @@ private:
     void setValueToMaxPage(int maxPage);
     void resizeEvent(QResizeEvent* event) override;
     void automaticNumberRows();
-    void showEvent(QShowEvent* event) override;
 
 private slots:
     void on_clearSearch_clicked();

@@ -10,11 +10,12 @@ ExistingTablesWindow::ExistingTablesWindow()
 
     renderingInterface();
     connects();
+    refreshStartModel();
 }
 
 ExistingTablesWindow::~ExistingTablesWindow()
 {
-    delete this;
+    delete _verticalLayout;
 }
 
 void ExistingTablesWindow::assigningValues()
@@ -26,6 +27,8 @@ void ExistingTablesWindow::assigningValues()
     _typeSearch = "%";
 
     _tableWorkInDB = "name_pred";
+
+    _autoNumRows = false;
 
     _typeSort =
     {
@@ -780,7 +783,7 @@ void ExistingTablesWindow::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
 
-    if(_autoNumRows)
+    if(_autoNumRows == true)
         automaticNumberRows();
 }
 
@@ -832,10 +835,5 @@ void ExistingTablesWindow::changeNumberRows()
     _rowsPerPage = num;
 
     refreshStartModel();
-}
 
-void ExistingTablesWindow::showEvent(QShowEvent* event)
-{
-    QWidget::showEvent(event);
-    refreshStartModel();
 }

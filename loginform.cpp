@@ -1,5 +1,6 @@
 ﻿#include "loginform.h"
 #include "adminpanelwindow.h"
+#include "role.h"
 #include <QDebug>
 #include <QSharedPointer>
 #include <QRandomGenerator>
@@ -123,7 +124,9 @@ void LoginForm::logInSystem()
 
     if(!role.isEmpty())
     {
-        AdminPanelWindow* adminPanel = new AdminPanelWindow(role);
+        Role rol(role);
+
+        AdminPanelWindow* adminPanel = new AdminPanelWindow();
         adminPanel->show();
 
         close();
