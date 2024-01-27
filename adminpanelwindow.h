@@ -20,8 +20,8 @@ private:
     QWidget* _mainWidget;
 
     CreateGameTableTab* _createGameTableTab;
-    ExistingTablesWindow* _existingTablesTab;
-    LoanApplicationsWindow* _loanApplicationsTab;
+    ExistingTables* _existingTablesTab;
+    LoanApplications* _loanApplicationsTab;
 
     QVBoxLayout* _verticalLayout_Main;
 

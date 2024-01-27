@@ -58,13 +58,13 @@ void AdminPanelWindow::rendering_CreateGameTableTab()
 
 void AdminPanelWindow::rendering_ExistingTablesTab()
 {
-    _existingTablesTab = new ExistingTablesWindow();
+    _existingTablesTab = new ExistingTables();
     _tabWidget->addTab(_existingTablesTab, "");
 }
 
 void AdminPanelWindow::rendering_LoanApplicationsTab()
 {
-    _loanApplicationsTab = new LoanApplicationsWindow();
+    _loanApplicationsTab = new LoanApplications();
     _tabWidget->addTab(_loanApplicationsTab, "");
 }
 

@@ -27,21 +27,24 @@
 #include <QPushButton>
 #include <QSpacerItem>
 #include <QStatusBar>
-#include <QTableView>
 #include <QVBoxLayout>
-#include <QWidget>
 
-class ExistingTablesWindow : public QWidget
+class ExistingTables : public QWidget
 {
+    Q_OBJECT
+
     int _currentPage;
     int _rowsPerPage;
     int _maxPageModel;
     int _minPageModel;
     int _maxPage;
     int _rowCountModel;
+    bool _autoNumRows;
     QString _filter;
     QString _sort;
     QString _typeSearch;
+    QString _tableWorkInDB;
+    QMutex _mutex;
 
     QMap<int, QString> _typeSort;
 
@@ -51,6 +54,7 @@ class ExistingTablesWindow : public QWidget
     QSharedPointer<MyThread> _nextTreadModel;
     QSharedPointer<MyThread> _prevTreadModel;
     QSharedPointer<MyThread> _getMaxPageTread;
+    QSharedPointer<MyThread> _getNamesColumn;
 
     QString _like;
     QString _column;
@@ -58,10 +62,6 @@ class ExistingTablesWindow : public QWidget
 
     QTimer _searchTimer;
     QTimer _goToPageTimer;
-
-    QString _tableWorkInDB;
-
-    bool _autoNumRows;
 
 private:
     QLabel* _labelSearch;
@@ -123,8 +123,8 @@ private:
     QString _pushButtonStyleSheet;
 
 public:
-    ExistingTablesWindow();
-    ~ExistingTablesWindow();
+    ExistingTables();
+    ~ExistingTables();
 
 private:
     void updateCurrentPageInLabel();
@@ -159,6 +159,7 @@ private:
     void setValueToMaxPage(int maxPage);
     void resizeEvent(QResizeEvent* event) override;
     void automaticNumberRows();
+    void setValueNameColumn(QVector<QString>* namesColumn);
 
 private slots:
     void on_clearSearch_clicked();

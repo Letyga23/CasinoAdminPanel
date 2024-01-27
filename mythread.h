@@ -30,15 +30,17 @@ public:
     void completion(QSharedPointer<QSqlQueryModel> model, QString nameTable, int limit, int offset, QString filters, QString sort);
     void getMaxPage(QString nameTable, int rowsPerPage, QString filters);
     void search(QString nameTable, QString column, QString like, QString typeSearch, QString filters, QString sort, int limit, int offset, int rowsPerPage);
+    void getNameColumn(QString nameTable);
     bool isRun();
 
 protected:
     void run() override;
 
 signals:
-    void returnMaxPage(int maxPage);
+    void returnMaxPage(int);
     void completedSuccessfully();
-    void searchResultFound(int currentPage, bool result);
+    void searchResultFound(int, bool);
+    void toSendNameColumng(QVector<QString>*);
 };
 
 #endif // MYTHREAD_H

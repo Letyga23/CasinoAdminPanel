@@ -27,11 +27,9 @@
 #include <QPushButton>
 #include <QSpacerItem>
 #include <QStatusBar>
-#include <QTableView>
 #include <QVBoxLayout>
-#include <QWidget>
 
-class LoanApplicationsWindow : public QWidget
+class LoanApplications : public QWidget
 {
     Q_OBJECT
 
@@ -41,9 +39,12 @@ class LoanApplicationsWindow : public QWidget
     int _minPageModel;
     int _maxPage;
     int _rowCountModel;
+    bool _autoNumRows;
     QString _filter;
     QString _sort;
     QString _typeSearch;
+    QString _tableWorkInDB;
+    QMutex _mutex;
 
     QMap<int, QString> _typeSort;
 
@@ -53,6 +54,7 @@ class LoanApplicationsWindow : public QWidget
     QSharedPointer<MyThread> _nextTreadModel;
     QSharedPointer<MyThread> _prevTreadModel;
     QSharedPointer<MyThread> _getMaxPageTread;
+    QSharedPointer<MyThread> _getNamesColumn;
 
     QString _like;
     QString _column;
@@ -60,10 +62,6 @@ class LoanApplicationsWindow : public QWidget
 
     QTimer _searchTimer;
     QTimer _goToPageTimer;
-
-    QString _tableWorkInDB;
-
-    bool _autoNumRows;
 
 private:
     QLabel* _labelSearch;
@@ -124,8 +122,8 @@ private:
     QString _pushButtonStyleSheet;
 
 public:
-    LoanApplicationsWindow();
-    ~LoanApplicationsWindow();
+    LoanApplications();
+    ~LoanApplications();
 
 private:
     void updateCurrentPageInLabel();
@@ -160,6 +158,7 @@ private:
     void setValueToMaxPage(int maxPage);
     void resizeEvent(QResizeEvent* event) override;
     void automaticNumberRows();
+    void setValueNameColumn(QVector<QString>* namesColumn);
 
 private slots:
     void on_clearSearch_clicked();

@@ -120,6 +120,34 @@ void MyThread::search(QString nameTable, QString column, QString like, QString t
     start();
 }
 
+void MyThread::getNameColumn(QString nameTable)
+{
+    setTask([=]()
+    {
+        _db->open();
+
+        QString request = QString("SELECT name FROM pragma_table_info('%1')").arg(nameTable);
+
+        _query->setQuery(request, *_db);
+
+        _db->close();
+
+        QVector<QString>* namesColumn = new QVector<QString>;
+
+        for (int row = 0; row < _query->rowCount(); row++)
+        {
+            QModelIndex index = _query->index(row, 0);
+            QString name = _query->data(index).toString();
+            namesColumn->push_back(name);
+        }
+
+        if(!namesColumn->isEmpty())
+            emit toSendNameColumng(namesColumn);
+    });
+
+    start();
+}
+
 bool MyThread::isRun()
 {
     if (_runThreadMutex.tryLock())

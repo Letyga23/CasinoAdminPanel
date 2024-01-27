@@ -1,24 +1,22 @@
 ﻿#include "existingtables.h"
-#include "adminpanelwindow.h"
 
-QMutex existingTables_Mutex;
-
-ExistingTablesWindow::ExistingTablesWindow()
+ExistingTables::ExistingTables()
 {
     assigningValues();
     creatingObjects();
 
     renderingInterface();
     connects();
-    refreshStartModel();
+
+    _getNamesColumn->getNameColumn(_tableWorkInDB);
 }
 
-ExistingTablesWindow::~ExistingTablesWindow()
+ExistingTables::~ExistingTables()
 {
     delete _verticalLayout;
 }
 
-void ExistingTablesWindow::assigningValues()
+void ExistingTables::assigningValues()
 {
     _currentPage = 1;
     _rowsPerPage = 10;
@@ -81,7 +79,7 @@ void ExistingTablesWindow::assigningValues()
     _goToPageTimer.setSingleShot(true);
 }
 
-void ExistingTablesWindow::workingWithTableView()
+void ExistingTables::workingWithTableView()
 {
     _tableView = new QTableView(this);
     _tableView->setFont(_font2);
@@ -108,7 +106,7 @@ void ExistingTablesWindow::workingWithTableView()
     _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void ExistingTablesWindow::creatingObjects()
+void ExistingTables::creatingObjects()
 {
     for(int i = 0; i < 3; i++)
         _models.push_back(QSharedPointer<QSqlQueryModel>::create());
@@ -119,21 +117,23 @@ void ExistingTablesWindow::creatingObjects()
     _prevTreadModel = QSharedPointer<MyThread>::create();
     _startTreadModel = QSharedPointer<MyThread>::create();
     _getMaxPageTread = QSharedPointer<MyThread>::create();
+    _getNamesColumn = QSharedPointer<MyThread>::create();
 }
 
-void ExistingTablesWindow::connects()
+void ExistingTables::connects()
 {
-    connect(_startTreadModel.get(), &MyThread::completedSuccessfully, this, &ExistingTablesWindow::startLoadModelFinished);
-    connect(_nextTreadModel.get(), &MyThread::completedSuccessfully, this, &ExistingTablesWindow::threadFinished);
-    connect(_prevTreadModel.get(), &MyThread::completedSuccessfully, this, &ExistingTablesWindow::threadFinished);
-    connect(_getMaxPageTread.get(), &MyThread::returnMaxPage, this, &ExistingTablesWindow::setValueToMaxPage);
+    connect(_startTreadModel.get(), &MyThread::completedSuccessfully, this, &ExistingTables::startLoadModelFinished);
+    connect(_nextTreadModel.get(), &MyThread::completedSuccessfully, this, &ExistingTables::threadFinished);
+    connect(_prevTreadModel.get(), &MyThread::completedSuccessfully, this, &ExistingTables::threadFinished);
+    connect(_getMaxPageTread.get(), &MyThread::returnMaxPage, this, &ExistingTables::setValueToMaxPage);
+    connect(_getNamesColumn.get(), &MyThread::toSendNameColumng, this, &ExistingTables::setValueNameColumn);
 
-    connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &ExistingTablesWindow::setFilter);
+    connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &ExistingTables::setFilter);
 
-    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTablesWindow::refreshStartModel);
-    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTablesWindow::refreshStartModel);
+    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::refreshStartModel);
+    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::refreshStartModel);
 
-    connect(&_searchTimer, &QTimer::timeout, this, &ExistingTablesWindow::searchInModels);
+    connect(&_searchTimer, &QTimer::timeout, this, &ExistingTables::searchInModels);
 
     connect(&_goToPageTimer, &QTimer::timeout, this, [=]()
     {
@@ -144,27 +144,27 @@ void ExistingTablesWindow::connects()
         }
     });
 
-    connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &ExistingTablesWindow::onHeaderClicked);
+    connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &ExistingTables::onHeaderClicked);
 
-    connect(_addFilter, &QPushButton::clicked, this, &ExistingTablesWindow::on_addFilter_clicked);
-    connect(_clearFilter, &QPushButton::clicked, this, &ExistingTablesWindow::on_clearFilter_clicked);
-    connect(_pushButton_search, &QPushButton::clicked, this, &ExistingTablesWindow::on_pushButton_search_clicked);
-    connect(_clearSearch, &QPushButton::clicked, this, &ExistingTablesWindow::on_clearSearch_clicked);
-    connect(_resetTable, &QPushButton::clicked, this, &ExistingTablesWindow::on_resetTable_clicked);
-    connect(_nextButton, &QPushButton::clicked, this, &ExistingTablesWindow::on_nextButton_clicked);
-    connect(_prevButton, &QPushButton::clicked, this, &ExistingTablesWindow::on_prevButton_clicked);
-    connect(_moreDetailed, &QPushButton::clicked, this, &ExistingTablesWindow::openMoreDetailed);
+    connect(_addFilter, &QPushButton::clicked, this, &ExistingTables::on_addFilter_clicked);
+    connect(_clearFilter, &QPushButton::clicked, this, &ExistingTables::on_clearFilter_clicked);
+    connect(_pushButton_search, &QPushButton::clicked, this, &ExistingTables::on_pushButton_search_clicked);
+    connect(_clearSearch, &QPushButton::clicked, this, &ExistingTables::on_clearSearch_clicked);
+    connect(_resetTable, &QPushButton::clicked, this, &ExistingTables::on_resetTable_clicked);
+    connect(_nextButton, &QPushButton::clicked, this, &ExistingTables::on_nextButton_clicked);
+    connect(_prevButton, &QPushButton::clicked, this, &ExistingTables::on_prevButton_clicked);
+    connect(_moreDetailed, &QPushButton::clicked, this, &ExistingTables::openMoreDetailed);
 
     for(QPushButton* buttonNum : _numberRows)
-        connect(buttonNum, &QPushButton::clicked, this, &ExistingTablesWindow::changeNumberRows);
+        connect(buttonNum, &QPushButton::clicked, this, &ExistingTables::changeNumberRows);
 
-    connect(_searchText, &QLineEdit::textChanged, this, &ExistingTablesWindow::on_searchText_textChanged);
-    connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &ExistingTablesWindow::on_pageNumberToNavigate_textChanged);
+    connect(_searchText, &QLineEdit::textChanged, this, &ExistingTables::on_searchText_textChanged);
+    connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &ExistingTables::on_pageNumberToNavigate_textChanged);
 
-    connect(_checkBox, &QCheckBox::stateChanged, this, &ExistingTablesWindow::on_checkBox_stateChanged);
+    connect(_checkBox, &QCheckBox::stateChanged, this, &ExistingTables::on_checkBox_stateChanged);
 }
 
-void ExistingTablesWindow::renderingInterface()
+void ExistingTables::renderingInterface()
 {
     _verticalLayout = new QVBoxLayout(this);
 
@@ -181,7 +181,7 @@ void ExistingTablesWindow::renderingInterface()
         comboBox->setStyleSheet(_comboBoxStyleSheet);
 }
 
-void ExistingTablesWindow::renderingLayout_1()
+void ExistingTables::renderingLayout_1()
 {
     _horizontalLayout = new QHBoxLayout();
 
@@ -191,8 +191,6 @@ void ExistingTablesWindow::renderingLayout_1()
     _horizontalLayout->addWidget(_labelSearch);
 
     _searchColumn = new QComboBox(this);
-    _searchColumn->addItem("Имя");
-    _searchColumn->addItem("Фамилия");
     _searchColumn->setFont(_font1);
     _horizontalLayout->addWidget(_searchColumn);
 
@@ -239,7 +237,7 @@ void ExistingTablesWindow::renderingLayout_1()
     _verticalLayout->addLayout(_horizontalLayout);
 }
 
-void ExistingTablesWindow::renderingLayout_2()
+void ExistingTables::renderingLayout_2()
 {
     _horizontalLayout_2 = new QHBoxLayout();
 
@@ -249,8 +247,6 @@ void ExistingTablesWindow::renderingLayout_2()
     _horizontalLayout_2->addWidget(_labelSortColumn);
 
     _sortingColumn = new QComboBox(this);
-    _sortingColumn->addItem("Имя");
-    _sortingColumn->addItem("Фамилия");
     _sortingColumn->setFont(_font1);
     _horizontalLayout_2->addWidget(_sortingColumn);
 
@@ -283,7 +279,7 @@ void ExistingTablesWindow::renderingLayout_2()
     _verticalLayout->addLayout(_horizontalLayout_2);
 }
 
-void ExistingTablesWindow::renderingLayout_3()
+void ExistingTables::renderingLayout_3()
 {
     _horizontalLayout_3 = new QHBoxLayout();
 
@@ -316,7 +312,7 @@ void ExistingTablesWindow::renderingLayout_3()
     _verticalLayout->addLayout(_horizontalLayout_3);
 }
 
-void ExistingTablesWindow::renderingLayout_4()
+void ExistingTables::renderingLayout_4()
 {
     QFont font;
     font.setFamily("Segoe UI");
@@ -356,7 +352,7 @@ void ExistingTablesWindow::renderingLayout_4()
     _verticalLayout->addLayout(_horizontalLayout_4);
 }
 
-void ExistingTablesWindow::renderingLayout_5()
+void ExistingTables::renderingLayout_5()
 {
     QFont font;
     font.setFamily("Segoe UI");
@@ -393,7 +389,7 @@ void ExistingTablesWindow::renderingLayout_5()
     _verticalLayout->addLayout(_horizontalLayout_5);
 }
 
-void ExistingTablesWindow::renderingLayout_6()
+void ExistingTables::renderingLayout_6()
 {
     _horizontalLayout_6 = new QHBoxLayout();
 
@@ -407,7 +403,7 @@ void ExistingTablesWindow::renderingLayout_6()
 }
 
 
-void ExistingTablesWindow::searchInDB()
+void ExistingTables::searchInDB()
 {
     int totalRowCount = _maxPage * _rowsPerPage;
     int limit = 2000;
@@ -431,7 +427,7 @@ void ExistingTablesWindow::searchInDB()
     }
 }
 
-void ExistingTablesWindow::initializationStartModel()
+void ExistingTables::initializationStartModel()
 {
     _status->setText("Идёт загрузка данных...");
     _tableView->setModel(nullptr);
@@ -447,12 +443,12 @@ void ExistingTablesWindow::initializationStartModel()
     loadingModel(_prevTreadModel, _models[2], prevOffset);
 }
 
-void ExistingTablesWindow::loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset)
+void ExistingTables::loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset)
 {
-    thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, std::ref(_filter), std::ref(_sort));
+    thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, _filter, _sort);
 }
 
-void ExistingTablesWindow::startLoadModelFinished()
+void ExistingTables::startLoadModelFinished()
 {
     blockingInterface(true);
     _status->clear();
@@ -462,18 +458,18 @@ void ExistingTablesWindow::startLoadModelFinished()
         searchInModels();
 }
 
-void ExistingTablesWindow::threadFinished()
+void ExistingTables::threadFinished()
 {
     _nextButton->setEnabled(true);
     _prevButton->setEnabled(true);
 }
 
-void ExistingTablesWindow::on_clearSearch_clicked()
+void ExistingTables::on_clearSearch_clicked()
 {
     _searchText->clear();
 }
 
-void ExistingTablesWindow::updateTablePage()
+void ExistingTables::updateTablePage()
 {
     updateCurrentPageInLabel();
 
@@ -488,12 +484,12 @@ void ExistingTablesWindow::updateTablePage()
     }
 }
 
-void ExistingTablesWindow::updateCurrentPageInLabel()
+void ExistingTables::updateCurrentPageInLabel()
 {
     _labelCurrentPage->setText(QString::number(_currentPage));
 }
 
-void ExistingTablesWindow::on_pageNumberToNavigate_textChanged()
+void ExistingTables::on_pageNumberToNavigate_textChanged()
 {
     if(_pageNumberToNavigate->text() == "0")
         _pageNumberToNavigate->clear();
@@ -501,7 +497,7 @@ void ExistingTablesWindow::on_pageNumberToNavigate_textChanged()
     _goToPageTimer.start(1000);
 }
 
-void ExistingTablesWindow::goToPage(int currentPage)
+void ExistingTables::goToPage(int currentPage)
 {
     int setPages = _currentPage - currentPageInModel();
 
@@ -516,7 +512,7 @@ void ExistingTablesWindow::goToPage(int currentPage)
     }
 }
 
-void ExistingTablesWindow::on_prevButton_clicked()
+void ExistingTables::on_prevButton_clicked()
 {
     if(_currentPage > 1)
     {
@@ -539,7 +535,7 @@ void ExistingTablesWindow::on_prevButton_clicked()
     }
 }
 
-void ExistingTablesWindow::on_nextButton_clicked()
+void ExistingTables::on_nextButton_clicked()
 {
     if(_currentPage < _maxPage)
     {
@@ -564,7 +560,7 @@ void ExistingTablesWindow::on_nextButton_clicked()
         QMessageBox::warning(this, "Внимание", "Данных больше нет!", QMessageBox::Ok);
 }
 
-void ExistingTablesWindow::setModel(QSharedPointer<QSqlQueryModel> model)
+void ExistingTables::setModel(QSharedPointer<QSqlQueryModel> model)
 {
     if(model->rowCount() == 0)
     {
@@ -584,7 +580,7 @@ void ExistingTablesWindow::setModel(QSharedPointer<QSqlQueryModel> model)
     updateTablePage();
 }
 
-void ExistingTablesWindow::goToNextModel()
+void ExistingTables::goToNextModel()
 {
     _currentPage++;
 
@@ -595,7 +591,7 @@ void ExistingTablesWindow::goToNextModel()
     loadingModel(_nextTreadModel, _models[1], nextOffset);
 }
 
-void ExistingTablesWindow::goToPrevModel()
+void ExistingTables::goToPrevModel()
 {
     _currentPage--;
 
@@ -606,7 +602,7 @@ void ExistingTablesWindow::goToPrevModel()
     loadingModel(_prevTreadModel, _models[2], prevOffset);
 }
 
-void ExistingTablesWindow::blockingInterface(bool flag)
+void ExistingTables::blockingInterface(bool flag)
 {
     QList<QPushButton*> pushbuttons = this->findChildren<QPushButton*>();
     for(QPushButton* pushbutton : pushbuttons)
@@ -620,7 +616,7 @@ void ExistingTablesWindow::blockingInterface(bool flag)
     _searchText->setEnabled(flag);
 }
 
-void ExistingTablesWindow::refreshStartModel()
+void ExistingTables::refreshStartModel()
 {
     QString typeSort = _typeSort[_typeSorting->currentIndex()];
     QString column = _sortingColumn->currentText();
@@ -639,12 +635,12 @@ void ExistingTablesWindow::refreshStartModel()
     initializationStartModel();
 }
 
-void ExistingTablesWindow::setFilter(const QString &filter)
+void ExistingTables::setFilter(const QString &filter)
 {
     _filter = filter;
 }
 
-void ExistingTablesWindow::on_addFilter_clicked()
+void ExistingTables::on_addFilter_clicked()
 {
     if (_filterDialog->exec() == QDialog::Accepted)
     {
@@ -653,7 +649,7 @@ void ExistingTablesWindow::on_addFilter_clicked()
     }
 }
 
-void ExistingTablesWindow::on_clearFilter_clicked()
+void ExistingTables::on_clearFilter_clicked()
 {
     if(!_filter.isEmpty())
     {
@@ -663,7 +659,7 @@ void ExistingTablesWindow::on_clearFilter_clicked()
     }
 }
 
-int ExistingTablesWindow::currentPageInModel()
+int ExistingTables::currentPageInModel()
 {
     int pageModel = _currentPage % _maxPageModel;
 
@@ -673,7 +669,7 @@ int ExistingTablesWindow::currentPageInModel()
     return pageModel;
 }
 
-void ExistingTablesWindow::searchInModels()
+void ExistingTables::searchInModels()
 {
     if(_searchText->text().isEmpty())
         return;
@@ -708,12 +704,12 @@ void ExistingTablesWindow::searchInModels()
     searchInDB();
 }
 
-void ExistingTablesWindow::on_searchText_textChanged()
+void ExistingTables::on_searchText_textChanged()
 {
     _searchTimer.start(1000);
 }
 
-void ExistingTablesWindow::on_comboBox_currentTextChanged(const QString &arg1)
+void ExistingTables::on_comboBox_currentTextChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
 
@@ -721,7 +717,7 @@ void ExistingTablesWindow::on_comboBox_currentTextChanged(const QString &arg1)
         searchInModels();
 }
 
-void ExistingTablesWindow::blockAndOperate(QObject* widget, const std::function<void()>& operation)
+void ExistingTables::blockAndOperate(QObject* widget, const std::function<void()>& operation)
 {
     widget->blockSignals(true);
     operation();
@@ -729,7 +725,7 @@ void ExistingTablesWindow::blockAndOperate(QObject* widget, const std::function<
 }
 
 
-void ExistingTablesWindow::on_resetTable_clicked()
+void ExistingTables::on_resetTable_clicked()
 {
     blockAndOperate(_searchText, [&]() { _searchText->clear(); });
     blockAndOperate(_sortingColumn, [&]() { _sortingColumn->setCurrentIndex(0); });
@@ -740,7 +736,7 @@ void ExistingTablesWindow::on_resetTable_clicked()
     refreshStartModel();
 }
 
-void ExistingTablesWindow::on_checkBox_stateChanged(int arg1)
+void ExistingTables::on_checkBox_stateChanged(int arg1)
 {
     if(arg1 == 2)
         _typeSearch.clear();
@@ -748,13 +744,13 @@ void ExistingTablesWindow::on_checkBox_stateChanged(int arg1)
         _typeSearch = '%';
 }
 
-void ExistingTablesWindow::on_pushButton_search_clicked()
+void ExistingTables::on_pushButton_search_clicked()
 {
     if(!_searchText->text().isEmpty())
         searchInModels();
 }
 
-void ExistingTablesWindow::onHeaderClicked(int logicalIndex)
+void ExistingTables::onHeaderClicked(int logicalIndex)
 {
     QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
 
@@ -771,21 +767,21 @@ void ExistingTablesWindow::onHeaderClicked(int logicalIndex)
         settingValueInComboBox(_searchColumn, headerText);
 }
 
-void ExistingTablesWindow::settingValueInComboBox(QComboBox* comboBox, QString& headerText)
+void ExistingTables::settingValueInComboBox(QComboBox* comboBox, QString& headerText)
 {
     int comboBoxIndex = comboBox->findText(headerText);
     if (comboBoxIndex != -1)
         comboBox->setCurrentIndex(comboBoxIndex);
 }
 
-void ExistingTablesWindow::setValueToMaxPage(int maxPage)
+void ExistingTables::setValueToMaxPage(int maxPage)
 {
-    QMutexLocker locker(&existingTables_Mutex);
+    QMutexLocker locker(&_mutex);
     _maxPage = maxPage;
     _labelMaxPage->setText(QString::number(_maxPage));
 }
 
-void ExistingTablesWindow::resizeEvent(QResizeEvent* event)
+void ExistingTables::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
 
@@ -793,7 +789,7 @@ void ExistingTablesWindow::resizeEvent(QResizeEvent* event)
         automaticNumberRows();
 }
 
-void ExistingTablesWindow::automaticNumberRows()
+void ExistingTables::automaticNumberRows()
 {
     if(_tableView->model())
     {
@@ -805,7 +801,7 @@ void ExistingTablesWindow::automaticNumberRows()
     }
 }
 
-void ExistingTablesWindow::changeNumberRows()
+void ExistingTables::changeNumberRows()
 {
     QPushButton* button = (QPushButton*)sender();
 
@@ -843,7 +839,28 @@ void ExistingTablesWindow::changeNumberRows()
     refreshStartModel();
 }
 
-void ExistingTablesWindow::openMoreDetailed()
+void ExistingTables::setValueNameColumn(QVector<QString>* namesColumn)
+{
+    for(QString nameColumn : *namesColumn)
+    {
+        _sortingColumn->blockSignals(true);
+        _sortingColumn->addItem(nameColumn);
+        _sortingColumn->blockSignals(false);
+
+        _searchColumn->blockSignals(true);
+        _searchColumn->addItem(nameColumn);
+        _searchColumn->blockSignals(false);
+    }
+
+    if(!namesColumn->isEmpty())
+    {
+        delete namesColumn;
+        refreshStartModel();
+    }
+}
+
+
+void ExistingTables::openMoreDetailed()
 {
 
 }

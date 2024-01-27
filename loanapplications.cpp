@@ -1,24 +1,22 @@
 ﻿#include "loanapplications.h"
-#include "adminpanelwindow.h"
 
-QMutex loanApplications_mutex;
-
-LoanApplicationsWindow::LoanApplicationsWindow()
+LoanApplications::LoanApplications()
 {
     assigningValues();
     creatingObjects();
 
     renderingInterface();
     connects();
-    refreshStartModel();
+
+    _getNamesColumn->getNameColumn(_tableWorkInDB);
 }
 
-LoanApplicationsWindow::~LoanApplicationsWindow()
+LoanApplications::~LoanApplications()
 {
     delete _verticalLayout;
 }
 
-void LoanApplicationsWindow::assigningValues()
+void LoanApplications::assigningValues()
 {
     _currentPage = 1;
     _rowsPerPage = 10;
@@ -81,7 +79,7 @@ void LoanApplicationsWindow::assigningValues()
     _goToPageTimer.setSingleShot(true);
 }
 
-void LoanApplicationsWindow::workingWithTableView()
+void LoanApplications::workingWithTableView()
 {
     _tableView = new QTableView(this);
     _tableView->setFont(_font2);
@@ -108,7 +106,7 @@ void LoanApplicationsWindow::workingWithTableView()
     _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void LoanApplicationsWindow::creatingObjects()
+void LoanApplications::creatingObjects()
 {
     for(int i = 0; i < 3; i++)
         _models.push_back(QSharedPointer<QSqlQueryModel>::create());
@@ -119,19 +117,21 @@ void LoanApplicationsWindow::creatingObjects()
     _prevTreadModel = QSharedPointer<MyThread>::create();
     _startTreadModel = QSharedPointer<MyThread>::create();
     _getMaxPageTread = QSharedPointer<MyThread>::create();
+    _getNamesColumn = QSharedPointer<MyThread>::create();
 }
 
-void LoanApplicationsWindow::connects()
+void LoanApplications::connects()
 {
-    connect(_startTreadModel.get(), &MyThread::completedSuccessfully, this, &LoanApplicationsWindow::startLoadModelFinished);
-    connect(_nextTreadModel.get(), &MyThread::completedSuccessfully, this, &LoanApplicationsWindow::threadFinished);
-    connect(_prevTreadModel.get(), &MyThread::completedSuccessfully, this, &LoanApplicationsWindow::threadFinished);
-    connect(_getMaxPageTread.get(), &MyThread::returnMaxPage, this, &LoanApplicationsWindow::setValueToMaxPage);
+    connect(_startTreadModel.get(), &MyThread::completedSuccessfully, this, &LoanApplications::startLoadModelFinished);
+    connect(_nextTreadModel.get(), &MyThread::completedSuccessfully, this, &LoanApplications::threadFinished);
+    connect(_prevTreadModel.get(), &MyThread::completedSuccessfully, this, &LoanApplications::threadFinished);
+    connect(_getMaxPageTread.get(), &MyThread::returnMaxPage, this, &LoanApplications::setValueToMaxPage);
+    connect(_getNamesColumn.get(), &MyThread::toSendNameColumng, this, &LoanApplications::setValueNameColumn);
 
-    connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &LoanApplicationsWindow::setFilter);
+    connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &LoanApplications::setFilter);
 
-    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplicationsWindow::refreshStartModel);
-    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplicationsWindow::refreshStartModel);
+    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::refreshStartModel);
+    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::refreshStartModel);
 
     connect(&_searchTimer, &QTimer::timeout, this, [=]()
     {
@@ -148,26 +148,26 @@ void LoanApplicationsWindow::connects()
         }
     });
 
-    connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &LoanApplicationsWindow::onHeaderClicked);
+    connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &LoanApplications::onHeaderClicked);
 
-    connect(_addFilter, &QPushButton::clicked, this, &LoanApplicationsWindow::on_addFilter_clicked);
-    connect(_clearFilter, &QPushButton::clicked, this, &LoanApplicationsWindow::on_clearFilter_clicked);
-    connect(_pushButton_search, &QPushButton::clicked, this, &LoanApplicationsWindow::on_pushButton_search_clicked);
-    connect(_clearSearch, &QPushButton::clicked, this, &LoanApplicationsWindow::on_clearSearch_clicked);
-    connect(_resetTable, &QPushButton::clicked, this, &LoanApplicationsWindow::on_resetTable_clicked);
-    connect(_nextButton, &QPushButton::clicked, this, &LoanApplicationsWindow::on_nextButton_clicked);
-    connect(_prevButton, &QPushButton::clicked, this, &LoanApplicationsWindow::on_prevButton_clicked);
+    connect(_addFilter, &QPushButton::clicked, this, &LoanApplications::on_addFilter_clicked);
+    connect(_clearFilter, &QPushButton::clicked, this, &LoanApplications::on_clearFilter_clicked);
+    connect(_pushButton_search, &QPushButton::clicked, this, &LoanApplications::on_pushButton_search_clicked);
+    connect(_clearSearch, &QPushButton::clicked, this, &LoanApplications::on_clearSearch_clicked);
+    connect(_resetTable, &QPushButton::clicked, this, &LoanApplications::on_resetTable_clicked);
+    connect(_nextButton, &QPushButton::clicked, this, &LoanApplications::on_nextButton_clicked);
+    connect(_prevButton, &QPushButton::clicked, this, &LoanApplications::on_prevButton_clicked);
 
     for(QPushButton* buttonNum : _numberRows)
-        connect(buttonNum, &QPushButton::clicked, this, &LoanApplicationsWindow::changeNumberRows);
+        connect(buttonNum, &QPushButton::clicked, this, &LoanApplications::changeNumberRows);
 
-    connect(_searchText, &QLineEdit::textChanged, this, &LoanApplicationsWindow::on_searchText_textChanged);
-    connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &LoanApplicationsWindow::on_pageNumberToNavigate_textChanged);
+    connect(_searchText, &QLineEdit::textChanged, this, &LoanApplications::on_searchText_textChanged);
+    connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &LoanApplications::on_pageNumberToNavigate_textChanged);
 
-    connect(_checkBox, &QCheckBox::stateChanged, this, &LoanApplicationsWindow::on_checkBox_stateChanged);
+    connect(_checkBox, &QCheckBox::stateChanged, this, &LoanApplications::on_checkBox_stateChanged);
 }
 
-void LoanApplicationsWindow::renderingInterface()
+void LoanApplications::renderingInterface()
 {
     resize(1000, 656);
 
@@ -186,7 +186,7 @@ void LoanApplicationsWindow::renderingInterface()
         comboBox->setStyleSheet(_comboBoxStyleSheet);
 }
 
-void LoanApplicationsWindow::renderingLayout_1()
+void LoanApplications::renderingLayout_1()
 {
     _horizontalLayout = new QHBoxLayout();
 
@@ -196,8 +196,6 @@ void LoanApplicationsWindow::renderingLayout_1()
     _horizontalLayout->addWidget(_labelSearch);
 
     _searchColumn = new QComboBox(this);
-    _searchColumn->addItem("Имя");
-    _searchColumn->addItem("Фамилия");
     _searchColumn->setFont(_font1);
     _horizontalLayout->addWidget(_searchColumn);
 
@@ -244,7 +242,7 @@ void LoanApplicationsWindow::renderingLayout_1()
     _verticalLayout->addLayout(_horizontalLayout);
 }
 
-void LoanApplicationsWindow::renderingLayout_2()
+void LoanApplications::renderingLayout_2()
 {
     _horizontalLayout_2 = new QHBoxLayout();
 
@@ -254,8 +252,6 @@ void LoanApplicationsWindow::renderingLayout_2()
     _horizontalLayout_2->addWidget(_labelSortColumn);
 
     _sortingColumn = new QComboBox(this);
-    _sortingColumn->addItem("Имя");
-    _sortingColumn->addItem("Фамилия");
     _sortingColumn->setFont(_font1);
     _horizontalLayout_2->addWidget(_sortingColumn);
 
@@ -282,7 +278,7 @@ void LoanApplicationsWindow::renderingLayout_2()
     _verticalLayout->addLayout(_horizontalLayout_2);
 }
 
-void LoanApplicationsWindow::renderingLayout_3()
+void LoanApplications::renderingLayout_3()
 {
     _horizontalLayout_3 = new QHBoxLayout();
 
@@ -315,7 +311,7 @@ void LoanApplicationsWindow::renderingLayout_3()
     _verticalLayout->addLayout(_horizontalLayout_3);
 }
 
-void LoanApplicationsWindow::renderingLayout_4()
+void LoanApplications::renderingLayout_4()
 {
     QFont font;
     font.setFamily("Segoe UI");
@@ -355,7 +351,7 @@ void LoanApplicationsWindow::renderingLayout_4()
     _verticalLayout->addLayout(_horizontalLayout_4);
 }
 
-void LoanApplicationsWindow::renderingLayout_5()
+void LoanApplications::renderingLayout_5()
 {
     QFont font;
     font.setFamily("Segoe UI");
@@ -392,7 +388,7 @@ void LoanApplicationsWindow::renderingLayout_5()
     _verticalLayout->addLayout(_horizontalLayout_5);
 }
 
-void LoanApplicationsWindow::renderingLayout_6()
+void LoanApplications::renderingLayout_6()
 {
     _horizontalLayout_6 = new QHBoxLayout();
 
@@ -406,7 +402,7 @@ void LoanApplicationsWindow::renderingLayout_6()
 }
 
 
-void LoanApplicationsWindow::searchInDB()
+void LoanApplications::searchInDB()
 {
     int totalRowCount = _maxPage * _rowsPerPage;
     int limit = 2000;
@@ -430,7 +426,7 @@ void LoanApplicationsWindow::searchInDB()
     }
 }
 
-void LoanApplicationsWindow::initializationStartModel()
+void LoanApplications::initializationStartModel()
 {
     _status->setText("Идёт загрузка данных...");
     _tableView->setModel(nullptr);
@@ -446,12 +442,12 @@ void LoanApplicationsWindow::initializationStartModel()
     loadingModel(_prevTreadModel, _models[2], prevOffset);
 }
 
-void LoanApplicationsWindow::loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset)
+void LoanApplications::loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset)
 {
     thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, std::ref(_filter), std::ref(_sort));
 }
 
-void LoanApplicationsWindow::startLoadModelFinished()
+void LoanApplications::startLoadModelFinished()
 {
     blockingInterface(true);
     _status->clear();
@@ -461,18 +457,18 @@ void LoanApplicationsWindow::startLoadModelFinished()
         searchInModels();
 }
 
-void LoanApplicationsWindow::threadFinished()
+void LoanApplications::threadFinished()
 {
     _nextButton->setEnabled(true);
     _prevButton->setEnabled(true);
 }
 
-void LoanApplicationsWindow::on_clearSearch_clicked()
+void LoanApplications::on_clearSearch_clicked()
 {
     _searchText->clear();
 }
 
-void LoanApplicationsWindow::updateTablePage()
+void LoanApplications::updateTablePage()
 {
     updateCurrentPageInLabel();
 
@@ -487,12 +483,12 @@ void LoanApplicationsWindow::updateTablePage()
     }
 }
 
-void LoanApplicationsWindow::updateCurrentPageInLabel()
+void LoanApplications::updateCurrentPageInLabel()
 {
     _labelCurrentPage->setText(QString::number(_currentPage));
 }
 
-void LoanApplicationsWindow::on_pageNumberToNavigate_textChanged()
+void LoanApplications::on_pageNumberToNavigate_textChanged()
 {
     if(_pageNumberToNavigate->text() == "0")
         _pageNumberToNavigate->clear();
@@ -500,7 +496,7 @@ void LoanApplicationsWindow::on_pageNumberToNavigate_textChanged()
     _goToPageTimer.start(1000);
 }
 
-void LoanApplicationsWindow::goToPage(int currentPage)
+void LoanApplications::goToPage(int currentPage)
 {
     int setPages = _currentPage - currentPageInModel();
 
@@ -515,7 +511,7 @@ void LoanApplicationsWindow::goToPage(int currentPage)
     }
 }
 
-void LoanApplicationsWindow::on_prevButton_clicked()
+void LoanApplications::on_prevButton_clicked()
 {
     if(_currentPage > 1)
     {
@@ -538,7 +534,7 @@ void LoanApplicationsWindow::on_prevButton_clicked()
     }
 }
 
-void LoanApplicationsWindow::on_nextButton_clicked()
+void LoanApplications::on_nextButton_clicked()
 {
     if(_currentPage < _maxPage)
     {
@@ -563,7 +559,7 @@ void LoanApplicationsWindow::on_nextButton_clicked()
         QMessageBox::warning(this, "Внимание", "Данных больше нет!", QMessageBox::Ok);
 }
 
-void LoanApplicationsWindow::setModel(QSharedPointer<QSqlQueryModel> model)
+void LoanApplications::setModel(QSharedPointer<QSqlQueryModel> model)
 {
     if(model->rowCount() == 0)
     {
@@ -583,7 +579,7 @@ void LoanApplicationsWindow::setModel(QSharedPointer<QSqlQueryModel> model)
     updateTablePage();
 }
 
-void LoanApplicationsWindow::goToNextModel()
+void LoanApplications::goToNextModel()
 {
     _currentPage++;
 
@@ -594,7 +590,7 @@ void LoanApplicationsWindow::goToNextModel()
     loadingModel(_nextTreadModel, _models[1], nextOffset);
 }
 
-void LoanApplicationsWindow::goToPrevModel()
+void LoanApplications::goToPrevModel()
 {
     _currentPage--;
 
@@ -605,7 +601,7 @@ void LoanApplicationsWindow::goToPrevModel()
     loadingModel(_prevTreadModel, _models[2], prevOffset);
 }
 
-void LoanApplicationsWindow::blockingInterface(bool flag)
+void LoanApplications::blockingInterface(bool flag)
 {
     QList<QPushButton*> pushbuttons = this->findChildren<QPushButton*>();
     for(QPushButton* pushbutton : pushbuttons)
@@ -620,7 +616,7 @@ void LoanApplicationsWindow::blockingInterface(bool flag)
     _searchText->setEnabled(flag);
 }
 
-void LoanApplicationsWindow::refreshStartModel()
+void LoanApplications::refreshStartModel()
 {
     QString typeSort = _typeSort[_typeSorting->currentIndex()];
     QString column = _sortingColumn->currentText();
@@ -639,12 +635,12 @@ void LoanApplicationsWindow::refreshStartModel()
     initializationStartModel();
 }
 
-void LoanApplicationsWindow::setFilter(const QString &filter)
+void LoanApplications::setFilter(const QString &filter)
 {
     _filter = filter;
 }
 
-void LoanApplicationsWindow::on_addFilter_clicked()
+void LoanApplications::on_addFilter_clicked()
 {
     if (_filterDialog->exec() == QDialog::Accepted)
     {
@@ -653,7 +649,7 @@ void LoanApplicationsWindow::on_addFilter_clicked()
     }
 }
 
-void LoanApplicationsWindow::on_clearFilter_clicked()
+void LoanApplications::on_clearFilter_clicked()
 {
     if(!_filter.isEmpty())
     {
@@ -663,7 +659,7 @@ void LoanApplicationsWindow::on_clearFilter_clicked()
     }
 }
 
-int LoanApplicationsWindow::currentPageInModel()
+int LoanApplications::currentPageInModel()
 {
     int pageModel = _currentPage % _maxPageModel;
 
@@ -673,7 +669,7 @@ int LoanApplicationsWindow::currentPageInModel()
     return pageModel;
 }
 
-void LoanApplicationsWindow::searchInModels()
+void LoanApplications::searchInModels()
 {
     bool resultSearchInModel = false;
     _like = _searchText->text();
@@ -705,12 +701,12 @@ void LoanApplicationsWindow::searchInModels()
     searchInDB();
 }
 
-void LoanApplicationsWindow::on_searchText_textChanged()
+void LoanApplications::on_searchText_textChanged()
 {
     _searchTimer.start(1000);
 }
 
-void LoanApplicationsWindow::on_comboBox_currentTextChanged(const QString &arg1)
+void LoanApplications::on_comboBox_currentTextChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
 
@@ -718,7 +714,7 @@ void LoanApplicationsWindow::on_comboBox_currentTextChanged(const QString &arg1)
         searchInModels();
 }
 
-void LoanApplicationsWindow::blockAndOperate(QObject* widget, const std::function<void()>& operation)
+void LoanApplications::blockAndOperate(QObject* widget, const std::function<void()>& operation)
 {
     widget->blockSignals(true);
     operation();
@@ -726,7 +722,7 @@ void LoanApplicationsWindow::blockAndOperate(QObject* widget, const std::functio
 }
 
 
-void LoanApplicationsWindow::on_resetTable_clicked()
+void LoanApplications::on_resetTable_clicked()
 {
     blockAndOperate(_searchText, [&]() { _searchText->clear(); });
     blockAndOperate(_sortingColumn, [&]() { _sortingColumn->setCurrentIndex(0); });
@@ -737,7 +733,7 @@ void LoanApplicationsWindow::on_resetTable_clicked()
     refreshStartModel();
 }
 
-void LoanApplicationsWindow::on_checkBox_stateChanged(int arg1)
+void LoanApplications::on_checkBox_stateChanged(int arg1)
 {
     if(arg1 == 2)
         _typeSearch.clear();
@@ -745,13 +741,13 @@ void LoanApplicationsWindow::on_checkBox_stateChanged(int arg1)
         _typeSearch = '%';
 }
 
-void LoanApplicationsWindow::on_pushButton_search_clicked()
+void LoanApplications::on_pushButton_search_clicked()
 {
     if(!_searchText->text().isEmpty())
         searchInModels();
 }
 
-void LoanApplicationsWindow::onHeaderClicked(int logicalIndex)
+void LoanApplications::onHeaderClicked(int logicalIndex)
 {
     QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
 
@@ -768,21 +764,21 @@ void LoanApplicationsWindow::onHeaderClicked(int logicalIndex)
         settingValueInComboBox(_searchColumn, headerText);
 }
 
-void LoanApplicationsWindow::settingValueInComboBox(QComboBox* comboBox, QString& headerText)
+void LoanApplications::settingValueInComboBox(QComboBox* comboBox, QString& headerText)
 {
     int comboBoxIndex = comboBox->findText(headerText);
     if (comboBoxIndex != -1)
         comboBox->setCurrentIndex(comboBoxIndex);
 }
 
-void LoanApplicationsWindow::setValueToMaxPage(int maxPage)
+void LoanApplications::setValueToMaxPage(int maxPage)
 {
-    QMutexLocker locker(&loanApplications_mutex);
+    QMutexLocker locker(&_mutex);
     _maxPage = maxPage;
     _labelMaxPage->setText(QString::number(_maxPage));
 }
 
-void LoanApplicationsWindow::resizeEvent(QResizeEvent* event)
+void LoanApplications::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
 
@@ -790,7 +786,7 @@ void LoanApplicationsWindow::resizeEvent(QResizeEvent* event)
         automaticNumberRows();
 }
 
-void LoanApplicationsWindow::automaticNumberRows()
+void LoanApplications::automaticNumberRows()
 {
     if(_tableView->model())
     {
@@ -802,7 +798,7 @@ void LoanApplicationsWindow::automaticNumberRows()
     }
 }
 
-void LoanApplicationsWindow::changeNumberRows()
+void LoanApplications::changeNumberRows()
 {
     QPushButton* button = (QPushButton*)sender();
 
@@ -838,4 +834,24 @@ void LoanApplicationsWindow::changeNumberRows()
     _rowsPerPage = num;
 
     refreshStartModel();
+}
+
+void LoanApplications::setValueNameColumn(QVector<QString>* namesColumn)
+{
+    for(QString nameColumn : *namesColumn)
+    {
+        _sortingColumn->blockSignals(true);
+        _sortingColumn->addItem(nameColumn);
+        _sortingColumn->blockSignals(false);
+
+        _searchColumn->blockSignals(true);
+        _searchColumn->addItem(nameColumn);
+        _searchColumn->blockSignals(false);
+    }
+
+    if(!namesColumn->isEmpty())
+    {
+        delete namesColumn;
+        refreshStartModel();
+    }
 }
