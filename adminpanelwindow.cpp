@@ -3,16 +3,15 @@
 AdminPanelWindow::AdminPanelWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    _role = Role::getRoleString();
-
-    creatingObjects();
+    assigningValues();
     renderingInterface();
-    connects();
 }
 
 AdminPanelWindow::~AdminPanelWindow()
 {
     delete _mainWidget;
+    delete _toolBar;
+    delete _statusBar;
 }
 
 void AdminPanelWindow::renderingInterface()
@@ -20,15 +19,8 @@ void AdminPanelWindow::renderingInterface()
     setWindowTitle("Админ панель");
     resize(1100, 750);
 
-    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-
-    QFont font;
-    font.setFamily("Segoe UI");
-    font.setPointSize(20);
-
     _mainWidget = new QWidget(this);
+    setCentralWidget(_mainWidget);
 
     _verticalLayout_Main = new QVBoxLayout(_mainWidget);
 
@@ -37,15 +29,25 @@ void AdminPanelWindow::renderingInterface()
     _verticalLayout_Main->addWidget(_tabWidget);
 
     _statusBar = new QStatusBar();
-    _statusBar->showMessage(_role);
+    _statusBar->showMessage(Role::getRoleString());
     setStatusBar(_statusBar);
 
-    setCentralWidget(_mainWidget);
+    _toolBar = new QToolBar;
+    addToolBar(_toolBar);
 
-    rendering_CreateGameTableTab();
-    rendering_ExistingTablesTab();
-    rendering_LoanApplicationsTab();
-    rendering_ToolBar();
+    switch (Role::getRoleEnum())
+    {
+    case RoleEnum::Administrator :
+        rendering_Admin();
+        break;
+
+    case RoleEnum::Dealer :
+        rendering_Diller();
+        break;
+    }
+
+    for (QAction* toolbarAction : _toolBar->actions())
+        toolbarAction->setFont(_standartFont);
 }
 
 void AdminPanelWindow::rendering_CreateGameTableTab()
@@ -66,46 +68,112 @@ void AdminPanelWindow::rendering_LoanApplicationsTab()
     _tabWidget->addTab(_loanApplicationsTab, "");
 }
 
-void AdminPanelWindow::rendering_ToolBar()
-{
-    _toolBar = new QToolBar;
-    addToolBar(_toolBar);
 
-    _toolBar->addAction(_openCreateTable);
-    _toolBar->addAction(_openExistingTable);
-    _toolBar->addAction(_openLoanAplications);
-}
-
-void AdminPanelWindow::connects()
+void AdminPanelWindow::connects_Admin()
 {
-    connect(_openCreateTable, &QAction::triggered, this, &AdminPanelWindow::openCreateTable);
-    connect(_openExistingTable, &QAction::triggered, this, &AdminPanelWindow::openExistingTable);
+    connects_Diller();
+
     connect(_openLoanAplications, &QAction::triggered, this, &AdminPanelWindow::openLoanAplications);
 }
 
-void AdminPanelWindow::creatingObjects()
+void AdminPanelWindow::connects_Diller()
 {
-    _openCreateTable = new QAction;
-    _openCreateTable->setText("Создать стол");
+    connect(_openCreateTable, &QAction::triggered, this, &AdminPanelWindow::openCreateTable);
+    connect(_openExistingTable, &QAction::triggered, this, &AdminPanelWindow::openExistingTable);
+}
 
-    _openExistingTable = new QAction;
-    _openExistingTable->setText("Существующие столы");
+void AdminPanelWindow::creatingObjects_Admin()
+{
+    creatingObjects_Diller();
 
-    _openLoanAplications = new QAction;
-    _openLoanAplications->setText("Заявки на кредиты");
+    _openLoanAplications = new QAction("Заявки на кредиты");
+}
+
+void AdminPanelWindow::creatingObjects_Diller()
+{
+    _openCreateTable = new QAction("Создать стол");
+    _openExistingTable = new QAction("Существующие столы");
 }
 
 void AdminPanelWindow::openCreateTable()
 {
+    selectAction();
     _tabWidget->setCurrentWidget(_createGameTableTab);
 }
 
 void AdminPanelWindow::openExistingTable()
 {
+    selectAction();
     _tabWidget->setCurrentWidget(_existingTablesTab);
 }
 
 void AdminPanelWindow::openLoanAplications()
 {
+    selectAction();
     _tabWidget->setCurrentWidget(_loanApplicationsTab);
+}
+
+void AdminPanelWindow::rendering_Admin()
+{
+    rendering_CreateGameTableTab();
+    rendering_ExistingTablesTab();
+    rendering_LoanApplicationsTab();
+
+    creatingObjects_Admin();
+
+    rendering_ToolBar_Admin();
+
+    connects_Admin();
+}
+
+void AdminPanelWindow::rendering_Diller()
+{
+    rendering_CreateGameTableTab();
+    rendering_ExistingTablesTab();
+
+    creatingObjects_Diller();
+
+    rendering_ToolBar_Diller();
+
+    connects_Diller();
+}
+
+void AdminPanelWindow::rendering_ToolBar_Admin()
+{
+    rendering_ToolBar_Diller();
+
+    _toolBar->addAction(_openLoanAplications);
+}
+
+void AdminPanelWindow::rendering_ToolBar_Diller()
+{
+    _toolBar->addAction(_openCreateTable);
+    _toolBar->addAction(_openExistingTable);
+}
+
+void AdminPanelWindow::selectAction()
+{
+    if (_lastAction != nullptr)
+    {
+        _lastAction->setFont(_standartFont);
+        _lastAction->setEnabled(true);
+    }
+
+    QAction* currentAction = qobject_cast<QAction*>(sender());
+    currentAction->setFont(_currentFont);
+    currentAction->setEnabled(false);
+
+    _lastAction = currentAction;
+}
+
+void AdminPanelWindow::assigningValues()
+{
+    _currentFont.setFamily("Segoe UI");
+    _currentFont.setPointSize(18);
+    _currentFont.setBold(true);
+
+    _standartFont.setFamily("Segoe UI");
+    _standartFont.setPointSize(18);
+
+    _lastAction = nullptr;
 }

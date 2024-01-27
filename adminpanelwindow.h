@@ -12,8 +12,9 @@
 class AdminPanelWindow : public QMainWindow
 {
     Q_OBJECT
-
-    QString _role;
+    QAction* _lastAction;
+    QFont _currentFont;
+    QFont _standartFont;
 
 private:
     QWidget* _mainWidget;
@@ -39,13 +40,25 @@ public:
     ~AdminPanelWindow();
 
 private:
+    void assigningValues();
+    void selectAction();
     void renderingInterface();
+
     void rendering_CreateGameTableTab();
     void rendering_ExistingTablesTab();
     void rendering_LoanApplicationsTab();
-    void rendering_ToolBar();
-    void connects();
-    void creatingObjects();
+
+    void connects_Admin();
+    void connects_Diller();
+
+    void creatingObjects_Admin();
+    void creatingObjects_Diller();
+
+    void rendering_Admin();
+    void rendering_Diller();
+
+    void rendering_ToolBar_Admin();
+    void rendering_ToolBar_Diller();
 
 private slots:
     void openCreateTable();

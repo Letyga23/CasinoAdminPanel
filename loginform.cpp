@@ -37,6 +37,7 @@ void LoginForm::connects()
 
 void LoginForm::renderingInterface()
 {
+    setWindowTitle("Вход");
     setFixedSize(370, 150);
     //    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint & ~Qt::WindowMinimizeButtonHint);
 
