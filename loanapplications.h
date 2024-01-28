@@ -38,7 +38,6 @@ class LoanApplications : public QWidget
     int _maxPageModel;
     int _minPageModel;
     int _maxPage;
-    int _rowCountModel;
     bool _autoNumRows;
     QString _filter;
     QString _sort;

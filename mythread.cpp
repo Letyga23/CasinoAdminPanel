@@ -39,7 +39,7 @@ void MyThread::run()
 
 void MyThread::completion(QSharedPointer<QSqlQueryModel> model, QString nameTable, int limit, int offset, QString filters, QString sort)
 {
-    setTask([=]() mutable
+    setTask([=]()
     {
         MyThread::sleep(2);
 
@@ -47,7 +47,7 @@ void MyThread::completion(QSharedPointer<QSqlQueryModel> model, QString nameTabl
 
         QString filterLimit = QString(" LIMIT %1 OFFSET %2").arg(limit).arg(offset);
         QString request("CREATE TEMPORARY TABLE temp_" + nameTable + " AS SELECT ROW_NUMBER() OVER () AS №, sorted_data.* FROM "
-                        "(SELECT * FROM " + nameTable + " ORDER BY " + sort + ") AS sorted_data WHERE 1=1" + filters + filterLimit);
+                        "(SELECT * FROM " + nameTable + " ORDER BY '" + sort + "') AS sorted_data WHERE 1=1" + filters + filterLimit);
 
         _query->setQuery(request, *_db);
 
@@ -76,14 +76,14 @@ void MyThread::getMaxPage(QString nameTable, int rowsPerPage, QString filters)
 
         _query->setQuery(request, *_db);
 
+        _db->close();
+
         if (!_query->lastError().isValid())
         {
             double rowCount = _query->data(_query->index(0, 0)).toDouble();
             int maxPage = static_cast<int>(std::ceil(rowCount / rowsPerPage));
             emit returnMaxPage(maxPage);
         }
-
-        _db->close();
     });
 
     start();
@@ -157,4 +157,21 @@ bool MyThread::isRun()
     }
     else
         return true;
+}
+
+void MyThread::request(QString request)
+{
+    setTask([=]()
+    {
+        _db->open();
+        _query->setQuery(request, *_db);
+        _db->close();
+
+        if (_query->lastError().isValid())
+            qDebug() << _query->lastError();
+        else
+            emit requestFinished();
+    });
+
+    start();
 }

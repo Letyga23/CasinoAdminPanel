@@ -7,11 +7,18 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
+#include <QSharedPointer>
+#include <QRandomGenerator>
+#include <QSqlDatabase>
+#include <QSqlQueryModel>
+
 
 class LoginForm : public QMainWindow
 {
     QFont _font;
     QFont _fontBold;
+    QSharedPointer<QSqlDatabase> _db;
+    QSharedPointer<QSqlQueryModel> _query;
 
 private:
     QWidget* _widget;
@@ -37,6 +44,7 @@ public:
     ~LoginForm();
 
 private:
+    void creatingObjects();
     void assigningValues();
     void connects();
     void renderingInterface();

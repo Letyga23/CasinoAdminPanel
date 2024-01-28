@@ -8,6 +8,7 @@
 #include "loanapplications.h"
 #include "creategametable.h"
 #include "role.h"
+#include "welcome.h"
 
 class AdminPanelWindow : public QMainWindow
 {
@@ -19,9 +20,7 @@ class AdminPanelWindow : public QMainWindow
 private:
     QWidget* _mainWidget;
 
-    CreateGameTableTab* _createGameTableTab;
-    ExistingTables* _existingTablesTab;
-    LoanApplications* _loanApplicationsTab;
+    Welcome* _welcomTab;
 
     QVBoxLayout* _verticalLayout_Main;
 
@@ -39,11 +38,16 @@ public:
     AdminPanelWindow(QWidget *parent = nullptr);
     ~AdminPanelWindow();
 
+    static CreateGameTableTab* _createGameTableTab;
+    static ExistingTables* _existingTablesTab;
+    static LoanApplications* _loanApplicationsTab;
+
 private:
     void assigningValues();
     void selectAction();
     void renderingInterface();
 
+    void rendering_WelcomeTab();
     void rendering_CreateGameTableTab();
     void rendering_ExistingTablesTab();
     void rendering_LoanApplicationsTab();

@@ -2,8 +2,6 @@
 #include "adminpanelwindow.h"
 #include "role.h"
 #include <QDebug>
-#include <QSharedPointer>
-#include <QRandomGenerator>
 #include <QMessageBox>
 
 LoginForm::LoginForm(QWidget *parent)
@@ -12,6 +10,7 @@ LoginForm::LoginForm(QWidget *parent)
     assigningValues();
     renderingInterface();
     connects();
+    creatingObjects();
 }
 
 LoginForm::~LoginForm()
@@ -33,6 +32,16 @@ void LoginForm::connects()
 {
     connect(_logIn, &QPushButton::clicked, this, &LoginForm::logInSystem);
     connect(_visiblePassword, &QPushButton::clicked, this, &LoginForm::visibilityPassword);
+}
+
+void LoginForm::creatingObjects()
+{
+    QString connectionName = "Connection_" + QString::number(QRandomGenerator::global()->generate());
+
+    _db = QSharedPointer<QSqlDatabase>::create(QSqlDatabase::addDatabase("QSQLITE", connectionName));
+    _db->setDatabaseName("Database/casino.sqlite");
+
+    _query = QSharedPointer<QSqlQueryModel>::create();
 }
 
 void LoginForm::renderingInterface()
@@ -107,21 +116,13 @@ void LoginForm::renderingLayut_3()
 
 void LoginForm::logInSystem()
 {
-    QString connectionName = "Connection_" + QString::number(QRandomGenerator::global()->generate());
-
-    QSharedPointer<QSqlDatabase> db = QSharedPointer<QSqlDatabase>::create(QSqlDatabase::addDatabase("QSQLITE", connectionName));
-    db->setDatabaseName("Database/casino.sqlite");
-
-    QSharedPointer<QSqlQueryModel> query = QSharedPointer<QSqlQueryModel>::create();
-
-    db->open();
-
     QString request("SELECT role FROM role WHERE login = " + _inputFieldLogin->text() + " and password = " + _inputFieldPassword->text() + "");
-    query->setQuery(request, *db);
 
-    db->close();
+    _db->open();
+    _query->setQuery(request, *_db);
+    _db->close();
 
-    QString role = query->data(query->index(0, 0)).toString();
+    QString role = _query->data(_query->index(0, 0)).toString();
 
     if(!role.isEmpty())
     {

@@ -38,7 +38,6 @@ class ExistingTables : public QWidget
     int _maxPageModel;
     int _minPageModel;
     int _maxPage;
-    int _rowCountModel;
     bool _autoNumRows;
     QString _filter;
     QString _sort;
@@ -125,6 +124,7 @@ private:
 public:
     ExistingTables();
     ~ExistingTables();
+    void refreshStartModel();
 
 private:
     void updateCurrentPageInLabel();
@@ -133,7 +133,6 @@ private:
     void loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset);
     void setModel(QSharedPointer<QSqlQueryModel> model);
     void setFilter(const QString& filter);
-    void refreshStartModel();
     void blockingInterface(bool flag);
     void startLoadModelFinished();
     void threadFinished();

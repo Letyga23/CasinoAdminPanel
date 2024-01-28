@@ -32,6 +32,7 @@ public:
     void search(QString nameTable, QString column, QString like, QString typeSearch, QString filters, QString sort, int limit, int offset, int rowsPerPage);
     void getNameColumn(QString nameTable);
     bool isRun();
+    void request(QString request);
 
 protected:
     void run() override;
@@ -41,6 +42,7 @@ signals:
     void completedSuccessfully();
     void searchResultFound(int, bool);
     void toSendNameColumng(QVector<QString>*);
+    void requestFinished();
 };
 
 #endif // MYTHREAD_H

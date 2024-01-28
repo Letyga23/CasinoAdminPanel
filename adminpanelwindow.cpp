@@ -1,5 +1,9 @@
 ﻿#include "adminpanelwindow.h"
 
+CreateGameTableTab* AdminPanelWindow::_createGameTableTab;
+ExistingTables* AdminPanelWindow::_existingTablesTab;
+LoanApplications* AdminPanelWindow::_loanApplicationsTab;
+
 AdminPanelWindow::AdminPanelWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -48,6 +52,12 @@ void AdminPanelWindow::renderingInterface()
 
     for (QAction* toolbarAction : _toolBar->actions())
         toolbarAction->setFont(_standartFont);
+}
+
+void AdminPanelWindow::rendering_WelcomeTab()
+{
+    _welcomTab = new Welcome(Role::getRoleString());
+    _tabWidget->addTab(_welcomTab, "");
 }
 
 void AdminPanelWindow::rendering_CreateGameTableTab()
@@ -115,8 +125,9 @@ void AdminPanelWindow::openLoanAplications()
 
 void AdminPanelWindow::rendering_Admin()
 {
-    rendering_CreateGameTableTab();
+    rendering_WelcomeTab();
     rendering_ExistingTablesTab();
+    rendering_CreateGameTableTab();
     rendering_LoanApplicationsTab();
 
     creatingObjects_Admin();
@@ -128,8 +139,9 @@ void AdminPanelWindow::rendering_Admin()
 
 void AdminPanelWindow::rendering_Diller()
 {
-    rendering_CreateGameTableTab();
+    rendering_WelcomeTab();
     rendering_ExistingTablesTab();
+    rendering_CreateGameTableTab();
 
     creatingObjects_Diller();
 

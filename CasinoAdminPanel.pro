@@ -24,7 +24,8 @@ SOURCES += \
     loginform.cpp \
     main.cpp \
     mythread.cpp \
-    role.cpp
+    role.cpp \
+    welcome.cpp
 
 HEADERS += \
     adminpanelwindow.h \
@@ -35,7 +36,8 @@ HEADERS += \
     loanapplications.h \
     loginform.h \
     mythread.h \
-    role.h
+    role.h \
+    welcome.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -58,3 +60,5 @@ DISTFILES += \
 
 RESOURCES += \
     assets.qrc
+
+FORMS +=

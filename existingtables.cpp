@@ -24,7 +24,7 @@ void ExistingTables::assigningValues()
     _minPageModel = 1;
     _typeSearch = "%";
 
-    _tableWorkInDB = "name_pred";
+    _tableWorkInDB = "ExistingTables_pred";
 
     _autoNumRows = false;
 
@@ -95,9 +95,14 @@ void ExistingTables::workingWithTableView()
     //Скрыть номер строк в tableView
     _tableView->verticalHeader()->setVisible(false);
 
-    //Устанавка растягивания для заголовков строк и столбцов на всю ширину
+    _tableView->horizontalHeader()->setStyleSheet("QHeaderView { font-size: 14pt; }");
+
+    //Устанавка растягивания для заголовков строк и столбцов на по размеру содержимого
     _tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    //Устанавка растягивания для строк и столбцов на всю высоту
     _tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
 
     //Запрет редактирования данных в ячейке
     _tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -476,8 +481,8 @@ void ExistingTables::updateTablePage()
     int startIndex = (currentPageInModel() - 1) * _rowsPerPage;
     int endIndex = startIndex + _rowsPerPage;
 
-    _rowCountModel = _tableView->model()->rowCount();
-    for (int row = 0; row < _rowCountModel; row++)
+    int rowCountModel = _tableView->model()->rowCount();
+    for (int row = 0; row < rowCountModel; row++)
     {
         bool rowVisible = (row >= startIndex && row < endIndex);
         _tableView->setRowHidden(row, !rowVisible);
@@ -570,15 +575,18 @@ void ExistingTables::setModel(QSharedPointer<QSqlQueryModel> model)
 
     _tableView->setModel(model.data());
 
-    _rowCountModel = _tableView->model()->rowCount();
+    _tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
-    if(model->columnCount() > 0)
-        _tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-
-    _tableView->horizontalHeader()->setStyleSheet("QHeaderView { font-size: 14pt; }");
+    for (int col = 1; col < model->columnCount(); ++col)
+    {
+        QString originalHeaderText = model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
+        QString wrappedHeaderText = originalHeaderText.replace(" ", "\n");
+        model->setHeaderData(col, Qt::Horizontal, wrappedHeaderText, Qt::DisplayRole);
+    }
 
     updateTablePage();
 }
+
 
 void ExistingTables::goToNextModel()
 {

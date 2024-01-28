@@ -8,42 +8,49 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QTimer>
+#include "mythread.h"
 #include "gamePluginInterface.h"
 
 class CreateGameTableTab : public QWidget
 {
+    Q_OBJECT
+
     QMap<int, GamePluginInterface*> _games;
+    QSharedPointer<MyThread> _requestTread;
+    QTimer _timerHideLabel;;
 
 private:
-    QVBoxLayout* verticalLayout;
+    QVBoxLayout* _verticalLayout;
 
-    QLabel *label;
-    QLabel *label_2;
-    QLabel *label_3;
-    QLabel *label_4;
+    QLabel* _label;
+    QLabel* _label_2;
+    QLabel* _label_3;
+    QLabel* _label_4;
+    QLabel* _tableHasBeenCreated;
 
-    QComboBox* comboBox;
-    QComboBox *selectGame;
+    QComboBox* _numPlayers;
+    QComboBox* _selectGame;
 
-    QLineEdit *lineEdit;
-    QLineEdit *lineEdit_2;
-    QLineEdit *lineEdit_3;
+    QLineEdit* _minBid;
+    QLineEdit* _minRateIncreaseStep;
+    QLineEdit* _minBudget;
 
-    QHBoxLayout *horizontalLayout;
-    QHBoxLayout *horizontalLayout_2;
-    QHBoxLayout *horizontalLayout_3;
-    QHBoxLayout *horizontalLayout_4;
-    QHBoxLayout *horizontalLayout_5;
-    QHBoxLayout *horizontalLayout_6;
+    QHBoxLayout* _horizontalLayout;
+    QHBoxLayout* _horizontalLayout_2;
+    QHBoxLayout* _horizontalLayout_3;
+    QHBoxLayout* _horizontalLayout_4;
+    QHBoxLayout* _horizontalLayout_5;
+    QHBoxLayout* _horizontalLayout_6;
 
-    QPushButton *create;
+    QPushButton* _create;
 
-    QSpacerItem *horizontalSpacer;
-    QSpacerItem *horizontalSpacer_2;
-    QSpacerItem *horizontalSpacer_3;
-    QSpacerItem *horizontalSpacer_4;
-    QSpacerItem *horizontalSpacer_5;
-    QSpacerItem *horizontalSpacer_6;
+    QSpacerItem* _horizontalSpacer;
+    QSpacerItem* _horizontalSpacer_2;
+    QSpacerItem* _horizontalSpacer_3;
+    QSpacerItem* _horizontalSpacer_4;
+    QSpacerItem* _horizontalSpacer_5;
+    QSpacerItem* _horizontalSpacer_6;
 
     QFont _fontLabel;
     QFont _fontBold;
@@ -57,6 +64,7 @@ private slots:
     void fillComboBoxNumPlayers(int index);
 
 private:
+    void creatingObjects();
     void loadPlugins();
     void addButtonGameStart(QObject* obj);
     void renderingInterface();
@@ -66,7 +74,10 @@ private:
     void renderingLayut_4();
     void renderingLayut_5();
     void renderingLayut_6();
+    void renderingLayut_7();
     void connects();
+    void resetData();
+    void tableHasBeenCreated();
 };
 
 #endif // CREATEGAMETABLEWINDOW_H
