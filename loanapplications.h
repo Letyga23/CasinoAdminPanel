@@ -28,6 +28,7 @@
 #include <QSpacerItem>
 #include <QStatusBar>
 #include <QVBoxLayout>
+#include <QTimer>
 
 class LoanApplications : public QWidget
 {
@@ -40,12 +41,14 @@ class LoanApplications : public QWidget
     int _maxPage;
     bool _autoNumRows;
     QString _filter;
-    QString _sort;
+    QString _columtSort;
+    QString _typeSort;
     QString _typeSearch;
     QString _tableWorkInDB;
     QMutex _mutex;
+    QTimer _resizeTimer;
 
-    QMap<int, QString> _typeSort;
+    QMap<int, QString> _typesSorting;
 
     QVector<QSharedPointer<QSqlQueryModel>> _models;
 

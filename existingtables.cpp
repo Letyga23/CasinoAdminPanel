@@ -28,10 +28,10 @@ void ExistingTables::assigningValues()
 
     _autoNumRows = false;
 
-    _typeSort =
+    _typesSorting =
     {
-        {0, " ASC"},
-        {1, " DESC"}
+        {0, "ASC"},
+        {1, "DESC"}
     };
 
     _font1.setFamily("Segoe UI");
@@ -77,6 +77,7 @@ void ExistingTables::assigningValues()
 
     _searchTimer.setSingleShot(true);
     _goToPageTimer.setSingleShot(true);
+    _resizeTimer.setSingleShot(true);
 }
 
 void ExistingTables::workingWithTableView()
@@ -139,6 +140,8 @@ void ExistingTables::connects()
     connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::refreshStartModel);
 
     connect(&_searchTimer, &QTimer::timeout, this, &ExistingTables::searchInModels);
+
+    connect(&_resizeTimer, &QTimer::timeout, this, &ExistingTables::automaticNumberRows);
 
     connect(&_goToPageTimer, &QTimer::timeout, this, [=]()
     {
@@ -428,7 +431,7 @@ void ExistingTables::searchInDB()
             else if (i == (numThreads - 1))
                 QMessageBox::warning(this, "Внимание", "Данных нет!", QMessageBox::Ok);
         });
-        searchTask->search(_tableWorkInDB, _column, _like, _typeSearch, _filter, _sort, limit, offset, _rowsPerPage);
+        searchTask->search(_tableWorkInDB, _column, _like, _typeSearch, _filter, _columtSort, _typeSort, limit, offset, _rowsPerPage);
     }
 }
 
@@ -450,7 +453,7 @@ void ExistingTables::initializationStartModel()
 
 void ExistingTables::loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset)
 {
-    thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, _filter, _sort);
+    thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, _filter, _columtSort, _typeSort);
 }
 
 void ExistingTables::startLoadModelFinished()
@@ -579,9 +582,9 @@ void ExistingTables::setModel(QSharedPointer<QSqlQueryModel> model)
 
     for (int col = 1; col < model->columnCount(); ++col)
     {
-        QString originalHeaderText = model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
+        QString originalHeaderText = model->headerData(col, Qt::Horizontal).toString();
         QString wrappedHeaderText = originalHeaderText.replace(" ", "\n");
-        model->setHeaderData(col, Qt::Horizontal, wrappedHeaderText, Qt::DisplayRole);
+        model->setHeaderData(col, Qt::Horizontal, wrappedHeaderText);
     }
 
     updateTablePage();
@@ -626,9 +629,8 @@ void ExistingTables::blockingInterface(bool flag)
 
 void ExistingTables::refreshStartModel()
 {
-    QString typeSort = _typeSort[_typeSorting->currentIndex()];
-    QString column = _sortingColumn->currentText();
-    _sort = column + typeSort;
+    _typeSort = _typesSorting[_typeSorting->currentIndex()];
+    _columtSort = _sortingColumn->currentText();
     _like.clear();
 
     blockingInterface(false);
@@ -761,6 +763,7 @@ void ExistingTables::on_pushButton_search_clicked()
 void ExistingTables::onHeaderClicked(int logicalIndex)
 {
     QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
+    headerText = headerText.replace("\n", " ");
 
     if (_sortingColumn->currentText() == headerText)
     {
@@ -793,12 +796,14 @@ void ExistingTables::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
 
-    if(_autoNumRows == true)
-        automaticNumberRows();
+    _resizeTimer.start(500);
 }
 
 void ExistingTables::automaticNumberRows()
 {
+    if(!_autoNumRows)
+        return;
+
     if(_tableView->model())
     {
         int visibleHeight = _tableView->viewport()->height();

@@ -28,10 +28,10 @@ void LoanApplications::assigningValues()
 
     _autoNumRows = false;
 
-    _typeSort =
+    _typesSorting =
     {
-        {0, " ASC"},
-        {1, " DESC"}
+        {0, "ASC"},
+        {1, "DESC"}
     };
 
     _font1.setFamily("Segoe UI");
@@ -77,6 +77,7 @@ void LoanApplications::assigningValues()
 
     _searchTimer.setSingleShot(true);
     _goToPageTimer.setSingleShot(true);
+    _resizeTimer.setSingleShot(true);
 }
 
 void LoanApplications::workingWithTableView()
@@ -137,11 +138,9 @@ void LoanApplications::connects()
     connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::refreshStartModel);
     connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::refreshStartModel);
 
-    connect(&_searchTimer, &QTimer::timeout, this, [=]()
-    {
-        if(!_searchText->text().isEmpty())
-            searchInModels();
-    });
+    connect(&_resizeTimer, &QTimer::timeout, this, &LoanApplications::automaticNumberRows);
+
+    connect(&_searchTimer, &QTimer::timeout, this, &LoanApplications::searchInModels);
 
     connect(&_goToPageTimer, &QTimer::timeout, this, [=]()
     {
@@ -426,7 +425,7 @@ void LoanApplications::searchInDB()
             else if (i == (numThreads - 1))
                 QMessageBox::warning(this, "Внимание", "Данных нет!", QMessageBox::Ok);
         });
-        searchTask->search(_tableWorkInDB, _column, _like, _typeSearch, _filter, _sort, limit, offset, _rowsPerPage);
+        searchTask->search(_tableWorkInDB, _column, _like, _typeSearch, _filter, _columtSort, _typeSort, limit, offset, _rowsPerPage);
     }
 }
 
@@ -448,7 +447,7 @@ void LoanApplications::initializationStartModel()
 
 void LoanApplications::loadingModel(QSharedPointer<MyThread> thread, QSharedPointer<QSqlQueryModel> model, int offset)
 {
-    thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, std::ref(_filter), std::ref(_sort));
+    thread->completion(std::ref(model), _tableWorkInDB, _rowsPerPage * _maxPageModel, offset, _filter, _columtSort, _typeSort);
 }
 
 void LoanApplications::startLoadModelFinished()
@@ -577,9 +576,9 @@ void LoanApplications::setModel(QSharedPointer<QSqlQueryModel> model)
 
     for (int col = 1; col < model->columnCount(); ++col)
     {
-        QString originalHeaderText = model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
+        QString originalHeaderText = model->headerData(col, Qt::Horizontal).toString();
         QString wrappedHeaderText = originalHeaderText.replace(" ", "\n");
-        model->setHeaderData(col, Qt::Horizontal, wrappedHeaderText, Qt::DisplayRole);
+        model->setHeaderData(col, Qt::Horizontal, wrappedHeaderText);
     }
 
     updateTablePage();
@@ -624,9 +623,8 @@ void LoanApplications::blockingInterface(bool flag)
 
 void LoanApplications::refreshStartModel()
 {
-    QString typeSort = _typeSort[_typeSorting->currentIndex()];
-    QString column = _sortingColumn->currentText();
-    _sort = column + typeSort;
+    _typeSort = _typesSorting[_typeSorting->currentIndex()];
+    _columtSort = _sortingColumn->currentText();
     _like.clear();
 
     blockingInterface(false);
@@ -677,6 +675,9 @@ int LoanApplications::currentPageInModel()
 
 void LoanApplications::searchInModels()
 {
+    if(_searchText->text().isEmpty())
+        return;
+
     bool resultSearchInModel = false;
     _like = _searchText->text();
     _column = _searchColumn->currentText();
@@ -756,6 +757,7 @@ void LoanApplications::on_pushButton_search_clicked()
 void LoanApplications::onHeaderClicked(int logicalIndex)
 {
     QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
+    headerText = headerText.replace("\n", " ");
 
     if (_sortingColumn->currentText() == headerText)
     {
@@ -788,12 +790,14 @@ void LoanApplications::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
 
-    if(_autoNumRows)
-        automaticNumberRows();
+    _resizeTimer.start(500);
 }
 
 void LoanApplications::automaticNumberRows()
 {
+    if(!_autoNumRows)
+        return;
+
     if(_tableView->model())
     {
         int visibleHeight = _tableView->viewport()->height();
