@@ -36,6 +36,7 @@ void MyThread::run()
     }
 }
 
+//Добавить возможность отключения сортировки
 void MyThread::completion(QSharedPointer<QSqlQueryModel> model, QString nameTable, int limit, int offset, QString filters, QString columnsSort, QString typeSort)
 {
     setTask([=]()
@@ -44,9 +45,14 @@ void MyThread::completion(QSharedPointer<QSqlQueryModel> model, QString nameTabl
 
         _db->open();
 
+        QString sort = "";
+
+        if(!columnsSort.isEmpty())
+            sort = " ORDER BY [" + columnsSort + "] " + typeSort;
+
         QString filterLimit = QString(" LIMIT %1 OFFSET %2").arg(limit).arg(offset);
         QString request("CREATE TEMPORARY TABLE temp_" + nameTable + " AS SELECT ROW_NUMBER() OVER () AS №, sorted_data.* FROM "
-                        "(SELECT * FROM " + nameTable + " ORDER BY [" + columnsSort + "] " + typeSort + ") AS sorted_data WHERE 1=1" + filters + filterLimit);
+                        "(SELECT * FROM " + nameTable + sort + ") AS sorted_data WHERE 1=1" + filters + filterLimit);
 
         _query->setQuery(request, *_db);
 

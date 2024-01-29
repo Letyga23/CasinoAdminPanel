@@ -27,6 +27,7 @@ void LoanApplications::assigningValues()
     _tableWorkInDB = "name_pred";
 
     _autoNumRows = false;
+    _sortingOn = false;
 
     _typesSorting =
     {
@@ -135,8 +136,8 @@ void LoanApplications::connects()
 
     connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &LoanApplications::setFilter);
 
-    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::refreshStartModel);
-    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::refreshStartModel);
+    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::sorting);
+    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::sorting);
 
     connect(&_resizeTimer, &QTimer::timeout, this, &LoanApplications::automaticNumberRows);
 
@@ -168,12 +169,11 @@ void LoanApplications::connects()
     connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &LoanApplications::on_pageNumberToNavigate_textChanged);
 
     connect(_checkBox, &QCheckBox::stateChanged, this, &LoanApplications::on_checkBox_stateChanged);
+    connect(_sorting, &QCheckBox::stateChanged, this, &LoanApplications::on_sorting_stateChanged);
 }
 
 void LoanApplications::renderingInterface()
 {
-    resize(1000, 656);
-
     _verticalLayout = new QVBoxLayout(this);
 
     renderingLayout_1();
@@ -268,6 +268,11 @@ void LoanApplications::renderingLayout_2()
     _typeSorting->addItem("Убыванию (Я-А)");
     _typeSorting->setFont(_font1);
     _horizontalLayout_2->addWidget(_typeSorting);
+
+    _sorting = new QCheckBox(this);
+    _sorting->setFont(_font2);
+    _sorting->setText("Сортировать");
+    _horizontalLayout_2->addWidget(_sorting);
 
     _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding);
     _horizontalLayout_2->addItem(_horizontalSpacer);
@@ -617,14 +622,15 @@ void LoanApplications::blockingInterface(bool flag)
     for(QComboBox* comboBox : comboBoxs)
         comboBox->setEnabled(flag);
 
+    _sorting->setEnabled(flag);
     _pageNumberToNavigate->setEnabled(flag);
     _searchText->setEnabled(flag);
 }
 
 void LoanApplications::refreshStartModel()
 {
+    _columtSort = (_sortingOn) ? _sortingColumn->currentText() : "";
     _typeSort = _typesSorting[_typeSorting->currentIndex()];
-    _columtSort = _sortingColumn->currentText();
     _like.clear();
 
     blockingInterface(false);
@@ -756,6 +762,9 @@ void LoanApplications::on_pushButton_search_clicked()
 
 void LoanApplications::onHeaderClicked(int logicalIndex)
 {
+    if(!_sortingOn)
+        return;
+
     QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
     headerText = headerText.replace("\n", " ");
 
@@ -865,3 +874,19 @@ void LoanApplications::setValueNameColumn(QVector<QString>* namesColumn)
         refreshStartModel();
     }
 }
+
+void LoanApplications::on_sorting_stateChanged(int arg1)
+{
+    _sortingOn = (arg1 == 2) ? true : false;
+
+    refreshStartModel();
+}
+
+void LoanApplications::sorting()
+{
+    if(!_sortingOn)
+        return;
+
+    refreshStartModel();
+}
+

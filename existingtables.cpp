@@ -27,6 +27,7 @@ void ExistingTables::assigningValues()
     _tableWorkInDB = "ExistingTables_pred";
 
     _autoNumRows = false;
+    _sortingOn = false;
 
     _typesSorting =
     {
@@ -136,8 +137,8 @@ void ExistingTables::connects()
 
     connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &ExistingTables::setFilter);
 
-    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::refreshStartModel);
-    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::refreshStartModel);
+    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
+    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
 
     connect(&_searchTimer, &QTimer::timeout, this, &ExistingTables::searchInModels);
 
@@ -170,6 +171,7 @@ void ExistingTables::connects()
     connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &ExistingTables::on_pageNumberToNavigate_textChanged);
 
     connect(_checkBox, &QCheckBox::stateChanged, this, &ExistingTables::on_checkBox_stateChanged);
+    connect(_sorting, &QCheckBox::stateChanged, this, &ExistingTables::on_sorting_stateChanged);
 }
 
 void ExistingTables::renderingInterface()
@@ -268,6 +270,11 @@ void ExistingTables::renderingLayout_2()
     _typeSorting->addItem("Убыванию (Я-А)");
     _typeSorting->setFont(_font1);
     _horizontalLayout_2->addWidget(_typeSorting);
+
+    _sorting = new QCheckBox(this);
+    _sorting->setFont(_font2);
+    _sorting->setText("Сортировать");
+    _horizontalLayout_2->addWidget(_sorting);
 
     _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding);
     _horizontalLayout_2->addItem(_horizontalSpacer);
@@ -623,14 +630,15 @@ void ExistingTables::blockingInterface(bool flag)
     for(QComboBox* comboBox : comboBoxs)
         comboBox->setEnabled(flag);
 
+    _sorting->setEnabled(flag);
     _pageNumberToNavigate->setEnabled(flag);
     _searchText->setEnabled(flag);
 }
 
 void ExistingTables::refreshStartModel()
-{
+{    
+    _columtSort = (_sortingOn) ? _sortingColumn->currentText() : "";
     _typeSort = _typesSorting[_typeSorting->currentIndex()];
-    _columtSort = _sortingColumn->currentText();
     _like.clear();
 
     blockingInterface(false);
@@ -762,6 +770,9 @@ void ExistingTables::on_pushButton_search_clicked()
 
 void ExistingTables::onHeaderClicked(int logicalIndex)
 {
+    if(!_sortingOn)
+        return;
+
     QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
     headerText = headerText.replace("\n", " ");
 
@@ -872,6 +883,20 @@ void ExistingTables::setValueNameColumn(QVector<QString>* namesColumn)
     }
 }
 
+void ExistingTables::on_sorting_stateChanged(int arg1)
+{
+    _sortingOn = (arg1 == 2) ? true : false;
+
+    refreshStartModel();
+}
+
+void ExistingTables::sorting()
+{
+    if(!_sortingOn)
+        return;
+
+    refreshStartModel();
+}
 
 void ExistingTables::openMoreDetailed()
 {

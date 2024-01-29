@@ -40,6 +40,7 @@ class ExistingTables : public QWidget
     int _minPageModel;
     int _maxPage;
     bool _autoNumRows;
+    bool _sortingOn;
     QString _filter;
     QString _columtSort;
     QString _typeSort;
@@ -93,6 +94,7 @@ private:
     QLineEdit* _pageNumberToNavigate;
 
     QCheckBox* _checkBox;
+    QCheckBox* _sorting;
 
     QPushButton* _pushButton_search;
     QPushButton* _clearSearch;
@@ -162,6 +164,7 @@ private:
     void resizeEvent(QResizeEvent* event) override;
     void automaticNumberRows();
     void setValueNameColumn(QVector<QString>* namesColumn);
+    void sorting();
 
 private slots:
     void on_clearSearch_clicked();
@@ -174,6 +177,7 @@ private slots:
     void on_comboBox_currentTextChanged(const QString &arg1);
     void on_resetTable_clicked();
     void on_checkBox_stateChanged(int arg1);
+    void on_sorting_stateChanged(int arg1);
     void on_pushButton_search_clicked();
     void onHeaderClicked(int logicalIndex);
     void changeNumberRows();

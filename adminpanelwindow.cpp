@@ -21,7 +21,7 @@ AdminPanelWindow::~AdminPanelWindow()
 void AdminPanelWindow::renderingInterface()
 {
     setWindowTitle("Админ панель");
-    resize(1100, 750);
+    resize(1200, 750);
 
     _mainWidget = new QWidget(this);
     setCentralWidget(_mainWidget);
