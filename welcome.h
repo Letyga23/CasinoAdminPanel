@@ -26,6 +26,7 @@ public:
 
 private:
     void renderingInterface();
+    void setTextToLabel();
 };
 
 #endif // WELCOM_H
