@@ -16,7 +16,7 @@ class CreateGameTableTab : public QWidget
 {
     Q_OBJECT
 
-    QMap<int, GamePluginInterface*> _games;
+    QMap<int, QVector<int>> _optionNumberOfPlayers;
     QSharedPointer<MyThread> _requestTread;
     QTimer _timerHideLabel;;
 
@@ -61,7 +61,7 @@ public:
 
 private slots:
     void creating();
-    void fillComboBoxNumPlayers(int index);
+    void fillComboBoxNumPlayers();
 
 private:
     void creatingObjects();

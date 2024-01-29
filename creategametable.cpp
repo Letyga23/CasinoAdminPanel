@@ -17,9 +17,6 @@ CreateGameTableTab::CreateGameTableTab()
 
 CreateGameTableTab::~CreateGameTableTab()
 {
-    qDeleteAll(_games);
-    _games.clear();
-
     delete _verticalLayout;
 }
 
@@ -211,7 +208,7 @@ void CreateGameTableTab::loadPlugins()
         QPluginLoader loader(dir.absoluteFilePath(strFileName));
         addButtonGameStart(qobject_cast<QObject*>(loader.instance()));
     }
-    fillComboBoxNumPlayers(_selectGame->currentIndex());
+    fillComboBoxNumPlayers();
 }
 
 void CreateGameTableTab::addButtonGameStart(QObject* obj)
@@ -226,8 +223,10 @@ void CreateGameTableTab::addButtonGameStart(QObject* obj)
         _selectGame->addItem(gameI->namePlugin());
         _selectGame->blockSignals(false);
 
-        _games.insert(_selectGame->count() - 1, gameI);
+        _optionNumberOfPlayers.insert(_selectGame->count() - 1, gameI->getOptionNumberOfPlayers());
     }
+
+    delete gameI;
 }
 
 void CreateGameTableTab::creating()
@@ -246,7 +245,7 @@ void CreateGameTableTab::creating()
     QString minBid = _minBid->text();
     QString minRateIncreaseStep = _minRateIncreaseStep->text();
     QString minBudget = _minBudget->text();
-    QString nameGame = _games[_selectGame->currentIndex()]->namePlugin();
+    QString nameGame = _selectGame->currentText();
 
     QString requst = "INSERT INTO ExistingTables (MaxNumberPlayers, MinBid, MinRateIncreaseStep, MinBudget, NameGame)"
                      "VALUES (" + maxNumberPlayers + ", " + minBid + ", " + minRateIncreaseStep + ", " + minBudget + ", '" + nameGame + "')";
@@ -262,15 +261,11 @@ void CreateGameTableTab::tableHasBeenCreated()
     _timerHideLabel.start(timeout);
 }
 
-void CreateGameTableTab::fillComboBoxNumPlayers(int index)
-{
-    QVector<int> optionNumberOfPlayers;
-    if (index >= 0 && index < _games.size())
-        optionNumberOfPlayers = _games[index]->getOptionNumberOfPlayers();
-
+void CreateGameTableTab::fillComboBoxNumPlayers()
+{    
     _numPlayers->clear();
 
-    for(int numPlayer : optionNumberOfPlayers)
+    for(int numPlayer : _optionNumberOfPlayers[_selectGame->currentIndex()])
         _numPlayers->addItem(QString::number(numPlayer));
 }
 
