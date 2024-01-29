@@ -117,7 +117,7 @@ void LoanApplications::creatingObjects()
     for(int i = 0; i < 3; i++)
         _models.push_back(QSharedPointer<QSqlQueryModel>::create());
 
-    _filterDialog = QSharedPointer<FilterDialog>::create(this);
+    _filterDialog = QSharedPointer<FilterDialog_LoanApplications>::create(this);
 
     _nextTreadModel = QSharedPointer<MyThread>::create();
     _prevTreadModel = QSharedPointer<MyThread>::create();
@@ -134,7 +134,7 @@ void LoanApplications::connects()
     connect(_getMaxPageTread.get(), &MyThread::returnMaxPage, this, &LoanApplications::setValueToMaxPage);
     connect(_getNamesColumn.get(), &MyThread::toSendNameColumng, this, &LoanApplications::setValueNameColumn);
 
-    connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &LoanApplications::setFilter);
+    connect(_filterDialog.get(), &FilterDialog_LoanApplications::filterSelected, this, &LoanApplications::setFilter);
 
     connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::sorting);
     connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LoanApplications::sorting);

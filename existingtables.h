@@ -1,5 +1,5 @@
-﻿#ifndef EXISTINGTABLESWINDOW_H
-#define EXISTINGTABLESWINDOW_H
+﻿#ifndef EXISTINGTABLES_H
+#define EXISTINGTABLES_H
 
 #include <QWidget>
 #include <QDebug>
@@ -11,7 +11,7 @@
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <functional>
-#include "filterdialog.h"
+#include "filterdialog_existingtables.h"
 #include "mythread.h"
 
 #include <QVariant>
@@ -61,7 +61,7 @@ class ExistingTables : public QWidget
 
     QString _like;
     QString _column;
-    QSharedPointer<FilterDialog> _filterDialog;
+    QSharedPointer<FilterDialog_ExistingTables> _filterDialog;
 
     QTimer _searchTimer;
     QTimer _goToPageTimer;
@@ -183,4 +183,4 @@ private slots:
     void changeNumberRows();
     void openMoreDetailed();
 };
-#endif // EXISTINGTABLESWINDOW_H
+#endif // EXISTINGTABLES_H

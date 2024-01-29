@@ -1,5 +1,5 @@
-﻿#ifndef LOANAPPLICATIONSWINDOW_H
-#define LOANAPPLICATIONSWINDOW_H
+﻿#ifndef LOANAPPLICATIONS_H
+#define LOANAPPLICATIONS_H
 
 #include <QWidget>
 #include <QDebug>
@@ -11,7 +11,7 @@
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <functional>
-#include "filterdialog.h"
+#include "filterdialog_loanapplications.h"
 #include "mythread.h"
 
 #include <QVariant>
@@ -61,7 +61,7 @@ class LoanApplications : public QWidget
 
     QString _like;
     QString _column;
-    QSharedPointer<FilterDialog> _filterDialog;
+    QSharedPointer<FilterDialog_LoanApplications> _filterDialog;
 
     QTimer _searchTimer;
     QTimer _goToPageTimer;
@@ -182,4 +182,4 @@ private slots:
     void changeNumberRows();
 };
 
-#endif // LOANAPPLICATIONSWINDOW_H
+#endif // LOANAPPLICATIONS_H

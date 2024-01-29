@@ -1,11 +1,11 @@
-﻿#include "filterdialog.h"
+﻿#include "filterdialog_existingtables.h"
 #include <QDebug>
 #include <QIntValidator>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QApplication>
 
-FilterDialog::FilterDialog(QWidget *parent) :
+FilterDialog_ExistingTables::FilterDialog_ExistingTables(QWidget *parent) :
     QDialog(parent)
 {
     renderingInterface();
@@ -13,12 +13,12 @@ FilterDialog::FilterDialog(QWidget *parent) :
     assigningValues();
 }
 
-FilterDialog::~FilterDialog()
+FilterDialog_ExistingTables::~FilterDialog_ExistingTables()
 {
     delete _verticalLayout;
 }
 
-void FilterDialog::assigningValues()
+void FilterDialog_ExistingTables::assigningValues()
 {
     _sign =
     {
@@ -35,16 +35,16 @@ void FilterDialog::assigningValues()
     };
 }
 
-void FilterDialog::connects()
+void FilterDialog_ExistingTables::connects()
 {
     QList<QLineEdit*> lineEdits = findChildren<QLineEdit*>();
     for(QLineEdit* lineEdit : lineEdits)
-        connect(lineEdit, &QLineEdit::textChanged, this, &FilterDialog::filterSelection);
+        connect(lineEdit, &QLineEdit::textChanged, this, &FilterDialog_ExistingTables::filterSelection);
 
-    connect(_pushButton, &QPushButton::clicked, this, &FilterDialog::applyFilter);
+    connect(_pushButton, &QPushButton::clicked, this, &FilterDialog_ExistingTables::applyFilter);
 }
 
-void FilterDialog::renderingInterface()
+void FilterDialog_ExistingTables::renderingInterface()
 {
     setWindowTitle("Фильтр");
     resize(466, 257);
@@ -97,7 +97,7 @@ void FilterDialog::renderingInterface()
     renderingConfirmationButton();
 }
 
-void FilterDialog::renderingFilter_1()
+void FilterDialog_ExistingTables::renderingFilter_1()
 {
     _horizontalLayout = new QHBoxLayout();
 
@@ -129,7 +129,7 @@ void FilterDialog::renderingFilter_1()
     _verticalLayout->addLayout(_horizontalLayout);
 }
 
-void FilterDialog::renderingFilter_2()
+void FilterDialog_ExistingTables::renderingFilter_2()
 {
     _horizontalLayout_2 = new QHBoxLayout();
 
@@ -161,7 +161,7 @@ void FilterDialog::renderingFilter_2()
     _verticalLayout->addLayout(_horizontalLayout_2);
 }
 
-void FilterDialog::renderingFilter_3()
+void FilterDialog_ExistingTables::renderingFilter_3()
 {
     _horizontalLayout_3 = new QHBoxLayout();
 
@@ -191,7 +191,7 @@ void FilterDialog::renderingFilter_3()
     _verticalLayout->addLayout(_horizontalLayout_3);
 }
 
-void FilterDialog::renderingFilter_4()
+void FilterDialog_ExistingTables::renderingFilter_4()
 {
     _horizontalLayout_4 = new QHBoxLayout();
 
@@ -221,7 +221,7 @@ void FilterDialog::renderingFilter_4()
     _verticalLayout->addLayout(_horizontalLayout_4);
 }
 
-void FilterDialog::renderingConfirmationButton()
+void FilterDialog_ExistingTables::renderingConfirmationButton()
 {
     _horizontalLayout_5 = new QHBoxLayout();
 
@@ -240,7 +240,7 @@ void FilterDialog::renderingConfirmationButton()
     _verticalLayout->addLayout(_horizontalLayout_5);
 }
 
-void FilterDialog::applyFilter()
+void FilterDialog_ExistingTables::applyFilter()
 {
     _filter.clear();
 
@@ -278,7 +278,7 @@ void FilterDialog::applyFilter()
     accept();
 }
 
-void FilterDialog::clearFilter()
+void FilterDialog_ExistingTables::clearFilter()
 {
     for(QCheckBox* filter : findChildren<QCheckBox*>())
         filter->setChecked(false);
@@ -289,7 +289,7 @@ void FilterDialog::clearFilter()
     emit filterSelected("");
 }
 
-void FilterDialog::filterSelection()
+void FilterDialog_ExistingTables::filterSelection()
 {
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(sender());
 

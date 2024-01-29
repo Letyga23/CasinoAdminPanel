@@ -118,7 +118,7 @@ void ExistingTables::creatingObjects()
     for(int i = 0; i < 3; i++)
         _models.push_back(QSharedPointer<QSqlQueryModel>::create());
 
-    _filterDialog = QSharedPointer<FilterDialog>::create(this);
+    _filterDialog = QSharedPointer<FilterDialog_ExistingTables>::create(this);
 
     _nextTreadModel = QSharedPointer<MyThread>::create();
     _prevTreadModel = QSharedPointer<MyThread>::create();
@@ -135,7 +135,7 @@ void ExistingTables::connects()
     connect(_getMaxPageTread.get(), &MyThread::returnMaxPage, this, &ExistingTables::setValueToMaxPage);
     connect(_getNamesColumn.get(), &MyThread::toSendNameColumng, this, &ExistingTables::setValueNameColumn);
 
-    connect(_filterDialog.get(), &FilterDialog::filterSelected, this, &ExistingTables::setFilter);
+    connect(_filterDialog.get(), &FilterDialog_ExistingTables::filterSelected, this, &ExistingTables::setFilter);
 
     connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
     connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);

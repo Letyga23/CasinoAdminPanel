@@ -19,7 +19,8 @@ SOURCES += \
     adminpanelwindow.cpp \
     creategametable.cpp \
     existingtables.cpp \
-    filterdialog.cpp \
+    filterdialog_existingtables.cpp \
+    filterdialog_loanapplications.cpp \
     loanapplications.cpp \
     loginform.cpp \
     main.cpp \
@@ -31,7 +32,8 @@ HEADERS += \
     adminpanelwindow.h \
     creategametable.h \
     existingtables.h \
-    filterdialog.h \
+    filterdialog_existingtables.h \
+    filterdialog_loanapplications.h \
     gamePluginInterface.h \
     loanapplications.h \
     loginform.h \

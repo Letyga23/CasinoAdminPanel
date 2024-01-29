@@ -1,5 +1,5 @@
-﻿#ifndef FILTERDIALOG_H
-#define FILTERDIALOG_H
+﻿#ifndef FILTERDIALOG_EXISTINGTABLES_H
+#define FILTERDIALOG_EXISTINGTABLES_H
 
 #include <QDialog>
 #include <QComboBox>
@@ -12,7 +12,7 @@ namespace Ui {
 class filterDialog;
 }
 
-class FilterDialog : public QDialog
+class FilterDialog_ExistingTables : public QDialog
 {
     Q_OBJECT
     QString _filter;
@@ -62,8 +62,8 @@ private:
 
 
 public:
-    explicit FilterDialog(QWidget* parent = nullptr);
-    ~FilterDialog();
+    explicit FilterDialog_ExistingTables(QWidget* parent = nullptr);
+    ~FilterDialog_ExistingTables();
 
     void clearFilter();
 
@@ -86,4 +86,4 @@ signals:
 
 };
 
-#endif // FILTERDIALOG_H
+#endif // FILTERDIALOG_EXISTINGTABLES_H
