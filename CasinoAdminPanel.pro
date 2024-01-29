@@ -51,6 +51,7 @@ DISTFILES += \
     Database/name.sqlite \
     assets/добавить фильтр.png \
     assets/очистить поиск.png \
+    assets/пароль открыт.png \
     assets/пароль спрятан.png \
     assets/поиск.png \
     assets/сбросить фильтр.png \
@@ -63,5 +64,3 @@ DISTFILES += \
 
 RESOURCES += \
     assets.qrc
-
-FORMS +=
