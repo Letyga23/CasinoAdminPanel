@@ -820,8 +820,13 @@ void ExistingTables::automaticNumberRows()
         int visibleHeight = _tableView->viewport()->height();
         int rowHeight = _tableView->verticalHeader()->defaultSectionSize();
 
-        _rowsPerPage = visibleHeight / rowHeight;
-        refreshStartModel();
+        if(visibleHeight / rowHeight != 0)
+        {
+            _rowsPerPage = visibleHeight / rowHeight;
+            refreshStartModel();
+        }
+        else
+            QMessageBox::warning(this, "Внимание", "Слишком маленькая высота", QMessageBox::Ok);
     }
 }
 
