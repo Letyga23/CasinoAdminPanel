@@ -1,6 +1,6 @@
 ﻿#include "loanapplications.h"
 
-LoanApplications::LoanApplications()
+LoanApplications::LoanApplications(QToolBar* toolBar) : _toolBar(toolBar)
 {
     assigningValues();
     creatingObjects();
@@ -154,11 +154,12 @@ void LoanApplications::connects()
 
     connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &LoanApplications::onHeaderClicked);
 
-    connect(_addFilter, &QPushButton::clicked, this, &LoanApplications::on_addFilter_clicked);
-    connect(_clearFilter, &QPushButton::clicked, this, &LoanApplications::on_clearFilter_clicked);
+    connect(_addFilter, &QAction::triggered, this, &LoanApplications::openAddFilters);
+    connect(_clearFilter, &QAction::triggered, this, &LoanApplications::clearFilters);
+    connect(_resetTable, &QAction::triggered, this, &LoanApplications::resetTable);
+
     connect(_pushButton_search, &QPushButton::clicked, this, &LoanApplications::on_pushButton_search_clicked);
     connect(_clearSearch, &QPushButton::clicked, this, &LoanApplications::on_clearSearch_clicked);
-    connect(_resetTable, &QPushButton::clicked, this, &LoanApplications::on_resetTable_clicked);
     connect(_nextButton, &QPushButton::clicked, this, &LoanApplications::on_nextButton_clicked);
     connect(_prevButton, &QPushButton::clicked, this, &LoanApplications::on_prevButton_clicked);
 
@@ -213,14 +214,14 @@ void LoanApplications::renderingLayout_1()
 
     _pushButton_search = new QPushButton(this);
     _pushButton_search->setFont(_font2);
-    _pushButton_search->setIcon(QIcon(":/assets/поиск.png"));
+    _pushButton_search->setIcon(QIcon(":/assets/search.png"));
     _pushButton_search->setIconSize(QSize(32, 32));
     _pushButton_search->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout->addWidget(_pushButton_search);
 
     _clearSearch = new QPushButton(this);
     _clearSearch->setFont(_font2);
-    _clearSearch->setIcon(QIcon(":/assets/очистить поиск.png"));
+    _clearSearch->setIcon(QIcon(":/assets/clearSearch.png"));
     _clearSearch->setIconSize(QSize(32, 32));
     _clearSearch->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout->addWidget(_clearSearch);
@@ -228,20 +229,19 @@ void LoanApplications::renderingLayout_1()
     _horizontalSpacer_6 = new QSpacerItem(209, 20);
     _horizontalLayout->addItem(_horizontalSpacer_6);
 
-    _addFilter = new QPushButton(this);
+    _addFilter = new QAction(this);
     _addFilter->setFont(_font2);
-    _addFilter->setIcon(QIcon(":/assets/добавить фильтр.png"));
-    _addFilter->setIconSize(QSize(32, 32));
-    _addFilter->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout->addWidget(_addFilter);
+    _addFilter->setIcon(QIcon(":/assets/addFilter.png"));
+    _addFilter->setVisible(false);
+    _addFilter->setText("Добавить фильтр");
+    _toolBar->addAction(_addFilter);
 
-    _clearFilter = new QPushButton(this);
+    _clearFilter = new QAction(this);
     _clearFilter->setFont(_font2);
-    _clearFilter->setIcon(QIcon(":/assets/сбросить фильтр.png"));
-    _clearFilter->setIconSize(QSize(32, 32));
-    _clearFilter->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout->addWidget(_clearFilter);
-
+    _clearFilter->setIcon(QIcon(":/assets/clearFilter.png"));
+    _clearFilter->setIconText("Сбросить фильтр");
+    _clearFilter->setVisible(false);
+    _toolBar->addAction(_clearFilter);
     _verticalLayout->addLayout(_horizontalLayout);
 }
 
@@ -277,12 +277,11 @@ void LoanApplications::renderingLayout_2()
     _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding);
     _horizontalLayout_2->addItem(_horizontalSpacer);
 
-    _resetTable = new QPushButton(this);
+    _resetTable = new QAction(this);
     _resetTable->setFont(_font2);
     _resetTable->setText("Сбросить \nрезультат");
-    _resetTable->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout_2->addWidget(_resetTable);
-
+    _resetTable->setVisible(false);
+    _toolBar->addAction(_resetTable);
     _verticalLayout->addLayout(_horizontalLayout_2);
 }
 
@@ -650,7 +649,7 @@ void LoanApplications::setFilter(const QString &filter)
     _filter = filter;
 }
 
-void LoanApplications::on_addFilter_clicked()
+void LoanApplications::openAddFilters()
 {
     if (_filterDialog->exec() == QDialog::Accepted)
     {
@@ -659,7 +658,7 @@ void LoanApplications::on_addFilter_clicked()
     }
 }
 
-void LoanApplications::on_clearFilter_clicked()
+void LoanApplications::clearFilters()
 {
     if(!_filter.isEmpty())
     {
@@ -735,7 +734,7 @@ void LoanApplications::blockAndOperate(QObject* widget, const std::function<void
 }
 
 
-void LoanApplications::on_resetTable_clicked()
+void LoanApplications::resetTable()
 {
     blockAndOperate(_searchText, [&]() { _searchText->clear(); });
     blockAndOperate(_sortingColumn, [&]() { _sortingColumn->setCurrentIndex(0); });
@@ -889,4 +888,23 @@ void LoanApplications::sorting()
 
     refreshStartModel();
 }
+
+void LoanApplications::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
+
+    QList<QAction*> actions = this->findChildren<QAction*>();
+    for(QAction* action : actions)
+        action->setVisible(true);
+}
+
+void LoanApplications::hideEvent(QHideEvent* event)
+{
+    QWidget::hideEvent(event);
+
+    QList<QAction*> actions = this->findChildren<QAction*>();
+    for(QAction* action : actions)
+        action->setVisible(false);
+}
+
 

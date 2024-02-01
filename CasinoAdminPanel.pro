@@ -49,12 +49,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     Database/casino.sqlite \
     Database/name.sqlite \
-    assets/добавить фильтр.png \
-    assets/очистить поиск.png \
-    assets/пароль открыт.png \
-    assets/пароль спрятан.png \
-    assets/поиск.png \
-    assets/сбросить фильтр.png \
+    assets/addFilter.png \
+    assets/clearFilter.png \
+    assets/clearSearch.png \
+    assets/passwordClose.png \
+    assets/passwordOpen.png \
+    assets/search.png \
     plugins/Card.dll \
     plugins/GamePlugins/BlackDjack.dll \
     plugins/GamePlugins/Devytka.dll \

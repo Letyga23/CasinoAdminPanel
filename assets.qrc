@@ -1,10 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>assets/очистить поиск.png</file>
-        <file>assets/поиск.png</file>
-        <file>assets/добавить фильтр.png</file>
-        <file>assets/сбросить фильтр.png</file>
-        <file>assets/пароль открыт.png</file>
-        <file>assets/пароль спрятан.png</file>
+        <file>assets/addFilter.png</file>
+        <file>assets/clearFilter.png</file>
+        <file>assets/clearSearch.png</file>
+        <file>assets/passwordClose.png</file>
+        <file>assets/passwordOpen.png</file>
+        <file>assets/search.png</file>
     </qresource>
 </RCC>

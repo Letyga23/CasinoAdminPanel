@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QAction>
 #include <QToolBar>
+#include <QMenuBar>
 #include "existingtables.h"
 #include "loanapplications.h"
 #include "creategametable.h"
@@ -14,8 +15,7 @@ class AdminPanelWindow : public QMainWindow
 {
     Q_OBJECT
     QAction* _lastAction;
-    QFont _currentFont;
-    QFont _standartFont;
+    QFont _standardFont;
 
 private:
     QWidget* _mainWidget;
@@ -28,6 +28,7 @@ private:
 
     QTabWidget* _tabWidget;
 
+    QMenuBar* _menuBar;
     QToolBar* _toolBar;
 
     QAction* _openCreateTable;
@@ -61,8 +62,8 @@ private:
     void rendering_Admin();
     void rendering_Diller();
 
-    void rendering_ToolBar_Admin();
-    void rendering_ToolBar_Diller();
+    void rendering_MenuBar_Admin();
+    void rendering_MenuBar_Diller();
 
 private slots:
     void openCreateTable();

@@ -90,7 +90,7 @@ void LoginForm::renderingLayut_2()
 
     _visiblePassword = new QPushButton(_widget);
     _visiblePassword->setToolTip("Показать пароль");
-    _visiblePassword->setIcon(QIcon(":/assets/пароль спрятан.png"));
+    _visiblePassword->setIcon(QIcon(":/assets/passwordClose.png"));
     _visiblePassword->setIconSize(QSize(32, 32));
     _gridLayout->addWidget(_visiblePassword, 1, 2);
 }
@@ -142,13 +142,13 @@ void LoginForm::visibilityPassword()
     if (_inputFieldPassword->echoMode() == QLineEdit::Password)
     {
         _visiblePassword->setToolTip("Скрыть пароль");
-        _visiblePassword->setIcon(QIcon(":/assets/пароль открыт.png"));
+        _visiblePassword->setIcon(QIcon(":/assets/passwordOpen.png"));
         _inputFieldPassword->setEchoMode(QLineEdit::Normal);
     }
     else
     {
         _visiblePassword->setToolTip("Показать пароль");
-        _visiblePassword->setIcon(QIcon(":/assets/пароль спрятан.png"));
+        _visiblePassword->setIcon(QIcon(":/assets/passwordClose.png"));
         _inputFieldPassword->setEchoMode(QLineEdit::Password);
     }
 }

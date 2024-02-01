@@ -1,6 +1,6 @@
 ﻿#include "existingtables.h"
 
-ExistingTables::ExistingTables()
+ExistingTables::ExistingTables(QToolBar* toolBar) : _toolBar(toolBar)
 {
     assigningValues();
     creatingObjects();
@@ -43,38 +43,38 @@ void ExistingTables::assigningValues()
     _font2.setPointSize(12);
 
     _pushButtonStyleSheet = "QPushButton {\n"
-                           "	background-color: #3498db;"
-                           "	border: 1px solid #2980b9;"
-                           "	color: #ffffff;"
-                           "	padding: 5px 10px;"
-                           "	border-radius: 3px;}"
+                            "	background-color: #3498db;"
+                            "	border: 1px solid #2980b9;"
+                            "	color: #ffffff;"
+                            "	padding: 5px 10px;"
+                            "	border-radius: 3px;}"
 
-                           "QPushButton:hover {background-color: #2184cb;border: 1px solid #1c6da5;}"
+                            "QPushButton:hover {background-color: #2184cb;border: 1px solid #1c6da5;}"
 
-                           "QPushButton:pressed {"
-                           "	background-color: #1a548b;"
-                           "	border: 1px solid #174172;}"
+                            "QPushButton:pressed {"
+                            "	background-color: #1a548b;"
+                            "	border: 1px solid #174172;}"
 
-                           "QPushButton:disabled {"
-                           "	background-color: #d3d3d3;"
-                           "	color: #555555;"
-                           "	border: 1px solid #a3a3a3;}";
+                            "QPushButton:disabled {"
+                            "	background-color: #d3d3d3;"
+                            "	color: #555555;"
+                            "	border: 1px solid #a3a3a3;}";
 
     _comboBoxStyleSheet = "QComboBox {"
-                         "    background-color: #0E9252;"
-                         "    border: 1px solid #2980b9;"
-                         "    color: #ffffff;"
-                         "    padding: 5px;"
-                         "    border-radius: 3px;}"
+                          "    background-color: #0E9252;"
+                          "    border: 1px solid #2980b9;"
+                          "    color: #ffffff;"
+                          "    padding: 5px;"
+                          "    border-radius: 3px;}"
 
-                         "QComboBox:hover {"
-                         "    background-color: #42A977;"
-                         "    border: 1px solid #1c6da5;}"
+                          "QComboBox:hover {"
+                          "    background-color: #42A977;"
+                          "    border: 1px solid #1c6da5;}"
 
-                         "QComboBox:disabled {"
-                         "    background-color: #d3d3d3;"
-                         "    color: #555555;"
-                         "    border: 1px solid #a3a3a3;}";
+                          "QComboBox:disabled {"
+                          "    background-color: #d3d3d3;"
+                          "    color: #555555;"
+                          "    border: 1px solid #a3a3a3;}";
 
     _searchTimer.setSingleShot(true);
     _goToPageTimer.setSingleShot(true);
@@ -104,7 +104,6 @@ void ExistingTables::workingWithTableView()
 
     //Устанавка растягивания для строк и столбцов на всю высоту
     _tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
 
     //Запрет редактирования данных в ячейке
     _tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -155,11 +154,12 @@ void ExistingTables::connects()
 
     connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &ExistingTables::onHeaderClicked);
 
-    connect(_addFilter, &QPushButton::clicked, this, &ExistingTables::on_addFilter_clicked);
-    connect(_clearFilter, &QPushButton::clicked, this, &ExistingTables::on_clearFilter_clicked);
+    connect(_addFilter, &QAction::triggered, this, &ExistingTables::openAddFilters);
+    connect(_clearFilter, &QAction::triggered, this, &ExistingTables::clearFilters);
+    connect(_resetTable, &QAction::triggered, this, &ExistingTables::resetTable);
+
     connect(_pushButton_search, &QPushButton::clicked, this, &ExistingTables::on_pushButton_search_clicked);
     connect(_clearSearch, &QPushButton::clicked, this, &ExistingTables::on_clearSearch_clicked);
-    connect(_resetTable, &QPushButton::clicked, this, &ExistingTables::on_resetTable_clicked);
     connect(_nextButton, &QPushButton::clicked, this, &ExistingTables::on_nextButton_clicked);
     connect(_prevButton, &QPushButton::clicked, this, &ExistingTables::on_prevButton_clicked);
     connect(_moreDetailed, &QPushButton::clicked, this, &ExistingTables::openMoreDetailed);
@@ -215,14 +215,14 @@ void ExistingTables::renderingLayout_1()
 
     _pushButton_search = new QPushButton(this);
     _pushButton_search->setFont(_font2);
-    _pushButton_search->setIcon(QIcon(":/assets/поиск.png"));
+    _pushButton_search->setIcon(QIcon(":/assets/search.png"));
     _pushButton_search->setIconSize(QSize(32, 32));
     _pushButton_search->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout->addWidget(_pushButton_search);
 
     _clearSearch = new QPushButton(this);
     _clearSearch->setFont(_font2);
-    _clearSearch->setIcon(QIcon(":/assets/очистить поиск.png"));
+    _clearSearch->setIcon(QIcon(":/assets/clearSearch.png"));
     _clearSearch->setIconSize(QSize(32, 32));
     _clearSearch->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout->addWidget(_clearSearch);
@@ -230,19 +230,19 @@ void ExistingTables::renderingLayout_1()
     _horizontalSpacer_6 = new QSpacerItem(209, 20);
     _horizontalLayout->addItem(_horizontalSpacer_6);
 
-    _addFilter = new QPushButton(this);
+    _addFilter = new QAction(this);
     _addFilter->setFont(_font2);
-    _addFilter->setIcon(QIcon(":/assets/добавить фильтр.png"));
-    _addFilter->setIconSize(QSize(32, 32));
-    _addFilter->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout->addWidget(_addFilter);
+    _addFilter->setIcon(QIcon(":/assets/addFilter.png"));
+    _addFilter->setVisible(false);
+    _addFilter->setText("Добавить фильтр");
+    _toolBar->addAction(_addFilter);
 
-    _clearFilter = new QPushButton(this);
+    _clearFilter = new QAction(this);
     _clearFilter->setFont(_font2);
-    _clearFilter->setIcon(QIcon(":/assets/сбросить фильтр.png"));
-    _clearFilter->setIconSize(QSize(32, 32));
-    _clearFilter->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout->addWidget(_clearFilter);
+    _clearFilter->setIcon(QIcon(":/assets/clearFilter.png"));
+    _clearFilter->setIconText("Сбросить фильтр");
+    _clearFilter->setVisible(false);
+    _toolBar->addAction(_clearFilter);
 
     _verticalLayout->addLayout(_horizontalLayout);
 }
@@ -285,11 +285,11 @@ void ExistingTables::renderingLayout_2()
     _moreDetailed->setStyleSheet(_pushButtonStyleSheet);
     _horizontalLayout_2->addWidget(_moreDetailed);
 
-    _resetTable = new QPushButton(this);
+    _resetTable = new QAction(this);
     _resetTable->setFont(_font2);
     _resetTable->setText("Сбросить \nрезультат");
-    _resetTable->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout_2->addWidget(_resetTable);
+    _resetTable->setVisible(false);
+    _toolBar->addAction(_resetTable);
 
     _verticalLayout->addLayout(_horizontalLayout_2);
 }
@@ -381,12 +381,12 @@ void ExistingTables::renderingLayout_5()
     int tact = 5;
     for(int num = 10; num <= 20; num += tact)
     {
-         QPushButton* numberRows = new QPushButton(this);
-         numberRows->setFont(font);
-         numberRows->setText(QString::number(num));
-         numberRows->setObjectName("_numberRows_" + QString::number(num));
-         _horizontalLayout_5->addWidget(numberRows);
-         _numberRows.push_back(numberRows);
+        QPushButton* numberRows = new QPushButton(this);
+        numberRows->setFont(font);
+        numberRows->setText(QString::number(num));
+        numberRows->setObjectName("_numberRows_" + QString::number(num));
+        _horizontalLayout_5->addWidget(numberRows);
+        _numberRows.push_back(numberRows);
     }
 
     _automaticNumberRows = new QPushButton(this);
@@ -658,7 +658,7 @@ void ExistingTables::setFilter(const QString &filter)
     _filter = filter;
 }
 
-void ExistingTables::on_addFilter_clicked()
+void ExistingTables::openAddFilters()
 {
     if (_filterDialog->exec() == QDialog::Accepted)
     {
@@ -667,7 +667,7 @@ void ExistingTables::on_addFilter_clicked()
     }
 }
 
-void ExistingTables::on_clearFilter_clicked()
+void ExistingTables::clearFilters()
 {
     if(!_filter.isEmpty())
     {
@@ -743,7 +743,7 @@ void ExistingTables::blockAndOperate(QObject* widget, const std::function<void()
 }
 
 
-void ExistingTables::on_resetTable_clicked()
+void ExistingTables::resetTable()
 {
     blockAndOperate(_searchText, [&]() { _searchText->clear(); });
     blockAndOperate(_sortingColumn, [&]() { _sortingColumn->setCurrentIndex(0); });
@@ -896,6 +896,24 @@ void ExistingTables::sorting()
         return;
 
     refreshStartModel();
+}
+
+void ExistingTables::showEvent(QShowEvent* event)
+{
+    QWidget::showEvent(event);
+
+    QList<QAction*> actions = this->findChildren<QAction*>();
+    for(QAction* action : actions)
+        action->setVisible(true);
+}
+
+void ExistingTables::hideEvent(QHideEvent* event)
+{
+    QWidget::hideEvent(event);
+
+    QList<QAction*> actions = this->findChildren<QAction*>();
+    for(QAction* action : actions)
+        action->setVisible(false);
 }
 
 void ExistingTables::openMoreDetailed()

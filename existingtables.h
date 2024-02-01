@@ -29,6 +29,8 @@
 #include <QStatusBar>
 #include <QVBoxLayout>
 #include <QTimer>
+#include <QAction>
+#include <QToolBar>
 
 class ExistingTables : public QWidget
 {
@@ -66,6 +68,12 @@ class ExistingTables : public QWidget
     QTimer _searchTimer;
     QTimer _goToPageTimer;
 
+    QFont _font1;
+    QFont _font2;
+
+    QString _comboBoxStyleSheet;
+    QString _pushButtonStyleSheet;
+
 private:
     QLabel* _labelSearch;
     QLabel* _labelGoToPageNum;
@@ -98,9 +106,6 @@ private:
 
     QPushButton* _pushButton_search;
     QPushButton* _clearSearch;
-    QPushButton* _addFilter;
-    QPushButton* _clearFilter;
-    QPushButton* _resetTable;
     QPushButton* _prevButton;
     QPushButton* _nextButton;
     QPushButton* _automaticNumberRows;
@@ -120,14 +125,14 @@ private:
 
     QTableView* _tableView;
 
-    QFont _font1;
-    QFont _font2;
+    QToolBar* _toolBar;
 
-    QString _comboBoxStyleSheet;
-    QString _pushButtonStyleSheet;
+    QAction* _addFilter;
+    QAction* _clearFilter;
+    QAction* _resetTable;
 
 public:
-    ExistingTables();
+    ExistingTables(QToolBar* toolBar);
     ~ExistingTables();
     void refreshStartModel();
 
@@ -162,6 +167,8 @@ private:
     void blockAndOperate(QObject* widget, const std::function<void()>& operation);
     void setValueToMaxPage(int maxPage);
     void resizeEvent(QResizeEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
     void automaticNumberRows();
     void setValueNameColumn(QVector<QString>* namesColumn);
     void sorting();
@@ -171,11 +178,11 @@ private slots:
     void on_pageNumberToNavigate_textChanged();
     void on_prevButton_clicked();
     void on_nextButton_clicked();
-    void on_addFilter_clicked();
-    void on_clearFilter_clicked();
+    void openAddFilters();
+    void clearFilters();
     void on_searchText_textChanged();
     void on_comboBox_currentTextChanged(const QString &arg1);
-    void on_resetTable_clicked();
+    void resetTable();
     void on_checkBox_stateChanged(int arg1);
     void on_sorting_stateChanged(int arg1);
     void on_pushButton_search_clicked();

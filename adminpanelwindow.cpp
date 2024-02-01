@@ -15,6 +15,7 @@ AdminPanelWindow::~AdminPanelWindow()
 {
     delete _mainWidget;
     delete _toolBar;
+    delete _menuBar;
     delete _statusBar;
 }
 
@@ -36,7 +37,12 @@ void AdminPanelWindow::renderingInterface()
     _statusBar->showMessage(Role::getRoleString());
     setStatusBar(_statusBar);
 
+    _menuBar = new QMenuBar;
+    setMenuBar(_menuBar);
+
     _toolBar = new QToolBar;
+    _toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    _toolBar->setStyleSheet("QToolBar { spacing: 10px; }");
     addToolBar(_toolBar);
 
     switch (Role::getRoleEnum())
@@ -50,8 +56,7 @@ void AdminPanelWindow::renderingInterface()
         break;
     }
 
-    for (QAction* toolbarAction : _toolBar->actions())
-        toolbarAction->setFont(_standartFont);
+_menuBar->setFont(_standardFont);
 }
 
 void AdminPanelWindow::rendering_WelcomeTab()
@@ -68,13 +73,13 @@ void AdminPanelWindow::rendering_CreateGameTableTab()
 
 void AdminPanelWindow::rendering_ExistingTablesTab()
 {
-    _existingTablesTab = new ExistingTables();
+    _existingTablesTab = new ExistingTables(_toolBar);
     _tabWidget->addTab(_existingTablesTab, "");
 }
 
 void AdminPanelWindow::rendering_LoanApplicationsTab()
 {
-    _loanApplicationsTab = new LoanApplications();
+    _loanApplicationsTab = new LoanApplications(_toolBar);
     _tabWidget->addTab(_loanApplicationsTab, "");
 }
 
@@ -132,7 +137,7 @@ void AdminPanelWindow::rendering_Admin()
 
     creatingObjects_Admin();
 
-    rendering_ToolBar_Admin();
+    rendering_MenuBar_Admin();
 
     connects_Admin();
 }
@@ -145,34 +150,30 @@ void AdminPanelWindow::rendering_Diller()
 
     creatingObjects_Diller();
 
-    rendering_ToolBar_Diller();
+    rendering_MenuBar_Diller();
 
     connects_Diller();
 }
 
-void AdminPanelWindow::rendering_ToolBar_Admin()
+void AdminPanelWindow::rendering_MenuBar_Admin()
 {
-    rendering_ToolBar_Diller();
+    rendering_MenuBar_Diller();
 
-    _toolBar->addAction(_openLoanAplications);
+    _menuBar->addAction(_openLoanAplications);
 }
 
-void AdminPanelWindow::rendering_ToolBar_Diller()
+void AdminPanelWindow::rendering_MenuBar_Diller()
 {
-    _toolBar->addAction(_openCreateTable);
-    _toolBar->addAction(_openExistingTable);
+    _menuBar->addAction(_openCreateTable);
+    _menuBar->addAction(_openExistingTable);
 }
 
 void AdminPanelWindow::selectAction()
 {
     if (_lastAction != nullptr)
-    {
-        _lastAction->setFont(_standartFont);
         _lastAction->setEnabled(true);
-    }
 
     QAction* currentAction = qobject_cast<QAction*>(sender());
-    currentAction->setFont(_currentFont);
     currentAction->setEnabled(false);
 
     _lastAction = currentAction;
@@ -180,12 +181,8 @@ void AdminPanelWindow::selectAction()
 
 void AdminPanelWindow::assigningValues()
 {
-    _currentFont.setFamily("Segoe UI");
-    _currentFont.setPointSize(18);
-    _currentFont.setBold(true);
-
-    _standartFont.setFamily("Segoe UI");
-    _standartFont.setPointSize(18);
+    _standardFont.setFamily("Segoe UI");
+    _standardFont.setPointSize(18);
 
     _lastAction = nullptr;
 }
