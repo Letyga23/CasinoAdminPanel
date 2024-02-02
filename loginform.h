@@ -2,55 +2,33 @@
 #define LOGINFORM_H
 
 #include <QMainWindow>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QLineEdit>
 #include <QSharedPointer>
 #include <QRandomGenerator>
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 
+namespace Ui {
+class LoginForm;
+}
 
 class LoginForm : public QMainWindow
 {
+    Q_OBJECT
+
+    Ui::LoginForm *ui;
     QFont _font;
     QFont _fontBold;
     QSharedPointer<QSqlDatabase> _db;
     QSharedPointer<QSqlQueryModel> _query;
 
-private:
-    QWidget* _widget;
-
-    QGridLayout* _gridLayout;
-
-    QLabel* _loginLabel;
-    QLabel* _passworLabel;
-
-    QLineEdit* _inputFieldLogin;
-    QLineEdit* _inputFieldPassword;
-
-    QHBoxLayout* _horizontalLayout;
-
-    QSpacerItem* _horizontalSpacer;
-    QSpacerItem* _horizontalSpacer_2;
-
-    QPushButton* _logIn;
-    QPushButton* _visiblePassword;
-
 public:
-    LoginForm(QWidget *parent = nullptr);
+    explicit LoginForm(QWidget *parent = nullptr);
     ~LoginForm();
 
 private:
     void creatingObjects();
     void assigningValues();
     void connects();
-    void renderingInterface();
-    void renderingLayut_1();
-    void renderingLayut_2();
-    void renderingLayut_3();
 
 private slots:
     void logInSystem();

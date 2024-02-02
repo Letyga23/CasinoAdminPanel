@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QToolBar>
 #include <QMenuBar>
+#include <QStatusBar>
 #include "existingtables.h"
 #include "loanapplications.h"
 #include "creategametable.h"
@@ -39,7 +40,7 @@ public:
     AdminPanelWindow(QWidget *parent = nullptr);
     ~AdminPanelWindow();
 
-    static CreateGameTableTab* _createGameTableTab;
+    static CreateGameTable* _createGameTableTab;
     static ExistingTables* _existingTablesTab;
     static LoanApplications* _loanApplicationsTab;
 

@@ -64,3 +64,11 @@ DISTFILES += \
 
 RESOURCES += \
     assets.qrc
+
+FORMS += \
+    creategametable.ui \
+    existingtables.ui \
+    filterdialog_existingtables.ui \
+    filterdialog_loanapplications.ui \
+    loanapplications.ui \
+    loginform.ui

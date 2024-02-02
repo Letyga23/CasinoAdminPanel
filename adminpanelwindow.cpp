@@ -1,6 +1,6 @@
 ﻿#include "adminpanelwindow.h"
 
-CreateGameTableTab* AdminPanelWindow::_createGameTableTab;
+CreateGameTable* AdminPanelWindow::_createGameTableTab;
 ExistingTables* AdminPanelWindow::_existingTablesTab;
 LoanApplications* AdminPanelWindow::_loanApplicationsTab;
 
@@ -67,7 +67,7 @@ void AdminPanelWindow::rendering_WelcomeTab()
 
 void AdminPanelWindow::rendering_CreateGameTableTab()
 {
-    _createGameTableTab = new CreateGameTableTab();
+    _createGameTableTab = new CreateGameTable();
     _tabWidget->addTab(_createGameTableTab, "");
 }
 

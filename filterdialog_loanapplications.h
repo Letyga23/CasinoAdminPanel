@@ -2,19 +2,18 @@
 #define FILTERDIALOG_LOANAPPLICATIONS_H
 
 #include <QDialog>
-#include <QComboBox>
+#include <QLineEdit>
 #include <QCheckBox>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
 
 namespace Ui {
-class filterDialog;
+class FilterDialog_LoanApplications;
 }
 
 class FilterDialog_LoanApplications : public QDialog
 {
     Q_OBJECT
+
+    Ui::FilterDialog_LoanApplications *ui;
     QString _filter;
     QMap<int, QString> _sign;
     QMap<QLineEdit*, QCheckBox*> _filterSelection;
@@ -22,47 +21,8 @@ class FilterDialog_LoanApplications : public QDialog
     QString _pushButtonStyleSheet;
     QFont _font;
 
-private:
-    QVBoxLayout* _verticalLayout;
-
-    QHBoxLayout* _horizontalLayout;
-    QHBoxLayout* _horizontalLayout_2;
-    QHBoxLayout* _horizontalLayout_3;
-    QHBoxLayout* _horizontalLayout_4;
-    QHBoxLayout* _horizontalLayout_5;
-
-    QCheckBox* _filter_1;
-    QCheckBox* _filter_2;
-    QCheckBox* _filter_3;
-    QCheckBox* _filter_4;
-
-    QComboBox* _comboBox;
-    QComboBox* _comboBox_2;
-    QComboBox* _comboBox_3;
-    QComboBox* _comboBox_4;
-
-    QLabel* _labelLetter;
-    QLabel* _label_2_Letter;
-    QLabel* _labelEnds;
-    QLabel* _labelStartsWith;
-
-    QLineEdit* _nameLenght;
-    QLineEdit* _surnameLenght;
-    QLineEdit* _ending;
-    QLineEdit* _beginning;
-
-    QSpacerItem* _horizontalSpacer;
-    QSpacerItem* _horizontalSpacer_2;
-    QSpacerItem* _horizontalSpacer_3;
-    QSpacerItem* _horizontalSpacer_4;
-    QSpacerItem* _horizontalSpacer_5;
-    QSpacerItem* _horizontalSpacer_6;
-
-    QPushButton* _pushButton;
-
-
 public:
-    explicit FilterDialog_LoanApplications(QWidget* parent = nullptr);
+    explicit FilterDialog_LoanApplications(QWidget *parent = nullptr);
     ~FilterDialog_LoanApplications();
 
     void clearFilter();
@@ -70,12 +30,6 @@ public:
 private:
     void assigningValues();
     void connects();
-    void renderingInterface();
-    void renderingFilter_1();
-    void renderingFilter_2();
-    void renderingFilter_3();
-    void renderingFilter_4();
-    void renderingConfirmationButton();
 
 private slots:
     void applyFilter();
@@ -83,7 +37,6 @@ private slots:
 
 signals:
     void filterSelected(QString filter);
-
 };
 
 #endif // FILTERDIALOG_LOANAPPLICATIONS_H

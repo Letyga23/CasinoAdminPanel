@@ -36,7 +36,6 @@ void MyThread::run()
     }
 }
 
-//Добавить возможность отключения сортировки
 void MyThread::completion(QSharedPointer<QSqlQueryModel> model, QString nameTable, int limit, int offset, QString filters, QString columnsSort, QString typeSort)
 {
     setTask([=]()

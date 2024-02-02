@@ -1,11 +1,18 @@
 ﻿#include "existingtables.h"
+#include "ui_existingtables.h"
 
-ExistingTables::ExistingTables(QToolBar* toolBar) : _toolBar(toolBar)
+ExistingTables::ExistingTables(QToolBar* toolBar, QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::ExistingTables),
+    _toolBar(toolBar)
 {
+    ui->setupUi(this);
+
     assigningValues();
     creatingObjects();
+    rendoringToolBar();
+    workingWithTableView();
 
-    renderingInterface();
     connects();
 
     _getNamesColumn->getNameColumn(_tableWorkInDB);
@@ -13,7 +20,7 @@ ExistingTables::ExistingTables(QToolBar* toolBar) : _toolBar(toolBar)
 
 ExistingTables::~ExistingTables()
 {
-    delete _verticalLayout;
+    delete ui;
 }
 
 void ExistingTables::assigningValues()
@@ -35,14 +42,7 @@ void ExistingTables::assigningValues()
         {1, "DESC"}
     };
 
-    _font1.setFamily("Segoe UI");
-    _font1.setPointSize(14);
-    _font1.setBold(true);
-
-    _font2.setFamily("Segoe UI");
-    _font2.setPointSize(12);
-
-    _pushButtonStyleSheet = "QPushButton {\n"
+    _pushButtonStyleSheet = "QPushButton {"
                             "	background-color: #3498db;"
                             "	border: 1px solid #2980b9;"
                             "	color: #ffffff;"
@@ -60,56 +60,62 @@ void ExistingTables::assigningValues()
                             "	color: #555555;"
                             "	border: 1px solid #a3a3a3;}";
 
-    _comboBoxStyleSheet = "QComboBox {"
-                          "    background-color: #0E9252;"
-                          "    border: 1px solid #2980b9;"
-                          "    color: #ffffff;"
-                          "    padding: 5px;"
-                          "    border-radius: 3px;}"
-
-                          "QComboBox:hover {"
-                          "    background-color: #42A977;"
-                          "    border: 1px solid #1c6da5;}"
-
-                          "QComboBox:disabled {"
-                          "    background-color: #d3d3d3;"
-                          "    color: #555555;"
-                          "    border: 1px solid #a3a3a3;}";
-
     _searchTimer.setSingleShot(true);
     _goToPageTimer.setSingleShot(true);
     _resizeTimer.setSingleShot(true);
+
+    _numberRows.push_back(ui->numberRows_10);
+    _numberRows.push_back(ui->numberRows_15);
+    _numberRows.push_back(ui->numberRows_20);
+    _numberRows.push_back(ui->automaticNumberRows);
 }
 
 void ExistingTables::workingWithTableView()
 {
-    _tableView = new QTableView(this);
-    _tableView->setFont(_font2);
-    _tableView->setStyleSheet("selection-background-color: rgb(42, 117, 255);");
-    _tableView->setWordWrap(false);
-    _verticalLayout->addWidget(_tableView);
+    ui->tableView->setStyleSheet("selection-background-color: rgb(42, 117, 255);");
+    ui->tableView->setWordWrap(false);
 
     //Устанавливка жирного шрифта для заголовков столбцов
-    QFont font = _tableView->horizontalHeader()->font();
+    QFont font = ui->tableView->horizontalHeader()->font();
     font.setBold(true);
-    _tableView->horizontalHeader()->setFont(font);
+    ui->tableView->horizontalHeader()->setFont(font);
 
     //Скрыть номер строк в tableView
-    _tableView->verticalHeader()->setVisible(false);
+    ui->tableView->verticalHeader()->setVisible(false);
 
-    _tableView->horizontalHeader()->setStyleSheet("QHeaderView { font-size: 14pt; }");
+    ui->tableView->horizontalHeader()->setStyleSheet("QHeaderView { font-size: 14pt; }");
 
     //Устанавка растягивания для заголовков строк и столбцов на по размеру содержимого
-    _tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     //Устанавка растягивания для строк и столбцов на всю высоту
-    _tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     //Запрет редактирования данных в ячейке
-    _tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     //Для выделения всей строки
-    _tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+}
+
+void ExistingTables::rendoringToolBar()
+{
+    _addFilter = new QAction(this);
+    _addFilter->setIcon(QIcon(":/assets/addFilter.png"));
+    _addFilter->setVisible(false);
+    _addFilter->setText("Добавить фильтр");
+    _toolBar->addAction(_addFilter);
+
+    _clearFilter = new QAction(this);
+    _clearFilter->setIcon(QIcon(":/assets/clearFilter.png"));
+    _clearFilter->setIconText("Сбросить фильтр");
+    _clearFilter->setVisible(false);
+    _toolBar->addAction(_clearFilter);
+
+    _resetTable = new QAction(this);
+    _resetTable->setText("Сбросить \nрезультат");
+    _resetTable->setVisible(false);
+    _toolBar->addAction(_resetTable);
 }
 
 void ExistingTables::creatingObjects()
@@ -136,8 +142,8 @@ void ExistingTables::connects()
 
     connect(_filterDialog.get(), &FilterDialog_ExistingTables::filterSelected, this, &ExistingTables::setFilter);
 
-    connect(_sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
-    connect(_typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
+    connect(ui->sortingColumn, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
+    connect(ui->typeSorting, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ExistingTables::sorting);
 
     connect(&_searchTimer, &QTimer::timeout, this, &ExistingTables::searchInModels);
 
@@ -145,278 +151,25 @@ void ExistingTables::connects()
 
     connect(&_goToPageTimer, &QTimer::timeout, this, [=]()
     {
-        if(!_pageNumberToNavigate->text().isEmpty())
+        if(!ui->pageNumberToNavigate->text().isEmpty())
         {
             _like.clear();
-            goToPage(_pageNumberToNavigate->text().toInt());
+            goToPage(ui->pageNumberToNavigate->text().toInt());
         }
     });
 
-    connect(_tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &ExistingTables::onHeaderClicked);
+    connect(ui->tableView->horizontalHeader(), &QHeaderView::sectionClicked, this, &ExistingTables::onHeaderClicked);
 
     connect(_addFilter, &QAction::triggered, this, &ExistingTables::openAddFilters);
     connect(_clearFilter, &QAction::triggered, this, &ExistingTables::clearFilters);
     connect(_resetTable, &QAction::triggered, this, &ExistingTables::resetTable);
 
-    connect(_pushButton_search, &QPushButton::clicked, this, &ExistingTables::on_pushButton_search_clicked);
-    connect(_clearSearch, &QPushButton::clicked, this, &ExistingTables::on_clearSearch_clicked);
-    connect(_nextButton, &QPushButton::clicked, this, &ExistingTables::on_nextButton_clicked);
-    connect(_prevButton, &QPushButton::clicked, this, &ExistingTables::on_prevButton_clicked);
-    connect(_moreDetailed, &QPushButton::clicked, this, &ExistingTables::openMoreDetailed);
-
     for(QPushButton* buttonNum : _numberRows)
         connect(buttonNum, &QPushButton::clicked, this, &ExistingTables::changeNumberRows);
 
-    connect(_searchText, &QLineEdit::textChanged, this, &ExistingTables::on_searchText_textChanged);
-    connect(_pageNumberToNavigate, &QLineEdit::textChanged, this, &ExistingTables::on_pageNumberToNavigate_textChanged);
-
-    connect(_checkBox, &QCheckBox::stateChanged, this, &ExistingTables::on_checkBox_stateChanged);
-    connect(_sorting, &QCheckBox::stateChanged, this, &ExistingTables::on_sorting_stateChanged);
+    connect(ui->searchText, &QLineEdit::textChanged, this, &ExistingTables::on_searchText_textChanged);
+    connect(ui->pageNumberToNavigate, &QLineEdit::textChanged, this, &ExistingTables::on_pageNumberToNavigate_textChanged);
 }
-
-void ExistingTables::renderingInterface()
-{
-    _verticalLayout = new QVBoxLayout(this);
-
-    renderingLayout_1();
-    renderingLayout_2();
-    workingWithTableView();
-    renderingLayout_3();
-    renderingLayout_4();
-    renderingLayout_5();
-    renderingLayout_6();
-
-    QList<QComboBox*> comboBoxs = findChildren<QComboBox*>();
-    for(QComboBox* comboBox : comboBoxs)
-        comboBox->setStyleSheet(_comboBoxStyleSheet);
-}
-
-void ExistingTables::renderingLayout_1()
-{
-    _horizontalLayout = new QHBoxLayout();
-
-    _labelSearch = new QLabel(this);
-    _labelSearch->setFont(_font1);
-    _labelSearch->setText("Поиск:");
-    _horizontalLayout->addWidget(_labelSearch);
-
-    _searchColumn = new QComboBox(this);
-    _searchColumn->setFont(_font1);
-    _horizontalLayout->addWidget(_searchColumn);
-
-    _searchText = new QLineEdit(this);
-    _searchText->setFont(_font1);
-    _horizontalLayout->addWidget(_searchText);
-
-    _checkBox = new QCheckBox(this);
-    _checkBox->setFont(_font2);
-    _checkBox->setText("Точное \nсовпадение");
-    _horizontalLayout->addWidget(_checkBox);
-
-    _pushButton_search = new QPushButton(this);
-    _pushButton_search->setFont(_font2);
-    _pushButton_search->setIcon(QIcon(":/assets/search.png"));
-    _pushButton_search->setIconSize(QSize(32, 32));
-    _pushButton_search->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout->addWidget(_pushButton_search);
-
-    _clearSearch = new QPushButton(this);
-    _clearSearch->setFont(_font2);
-    _clearSearch->setIcon(QIcon(":/assets/clearSearch.png"));
-    _clearSearch->setIconSize(QSize(32, 32));
-    _clearSearch->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout->addWidget(_clearSearch);
-
-    _horizontalSpacer_6 = new QSpacerItem(209, 20);
-    _horizontalLayout->addItem(_horizontalSpacer_6);
-
-    _addFilter = new QAction(this);
-    _addFilter->setFont(_font2);
-    _addFilter->setIcon(QIcon(":/assets/addFilter.png"));
-    _addFilter->setVisible(false);
-    _addFilter->setText("Добавить фильтр");
-    _toolBar->addAction(_addFilter);
-
-    _clearFilter = new QAction(this);
-    _clearFilter->setFont(_font2);
-    _clearFilter->setIcon(QIcon(":/assets/clearFilter.png"));
-    _clearFilter->setIconText("Сбросить фильтр");
-    _clearFilter->setVisible(false);
-    _toolBar->addAction(_clearFilter);
-
-    _verticalLayout->addLayout(_horizontalLayout);
-}
-
-void ExistingTables::renderingLayout_2()
-{
-    _horizontalLayout_2 = new QHBoxLayout();
-
-    _labelSortColumn = new QLabel(this);
-    _labelSortColumn->setFont(_font2);
-    _labelSortColumn->setText("Сортировать столбец:");
-    _horizontalLayout_2->addWidget(_labelSortColumn);
-
-    _sortingColumn = new QComboBox(this);
-    _sortingColumn->setFont(_font1);
-    _horizontalLayout_2->addWidget(_sortingColumn);
-
-    _label_6 = new QLabel(this);
-    _label_6->setFont(_font2);
-    _label_6->setText("по");
-    _horizontalLayout_2->addWidget(_label_6);
-
-    _typeSorting = new QComboBox(this);
-    _typeSorting->addItem("Возрастанию (А-Я)");
-    _typeSorting->addItem("Убыванию (Я-А)");
-    _typeSorting->setFont(_font1);
-    _horizontalLayout_2->addWidget(_typeSorting);
-
-    _sorting = new QCheckBox(this);
-    _sorting->setFont(_font2);
-    _sorting->setText("Сортировать");
-    _horizontalLayout_2->addWidget(_sorting);
-
-    _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding);
-    _horizontalLayout_2->addItem(_horizontalSpacer);
-
-    _moreDetailed = new QPushButton(this);
-    _moreDetailed->setFont(_font1);
-    _moreDetailed->setText("Подробнее");
-    _moreDetailed->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout_2->addWidget(_moreDetailed);
-
-    _resetTable = new QAction(this);
-    _resetTable->setFont(_font2);
-    _resetTable->setText("Сбросить \nрезультат");
-    _resetTable->setVisible(false);
-    _toolBar->addAction(_resetTable);
-
-    _verticalLayout->addLayout(_horizontalLayout_2);
-}
-
-void ExistingTables::renderingLayout_3()
-{
-    _horizontalLayout_3 = new QHBoxLayout();
-
-    _horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_3->addItem(_horizontalSpacer_5);
-
-    _labelSelectPage = new QLabel(this);
-    _labelSelectPage->setFont(_font2);
-    _labelSelectPage->setText("Текущая страница:");
-    _horizontalLayout_3->addWidget(_labelSelectPage);
-
-    _labelCurrentPage = new QLabel(this);
-    _labelCurrentPage->setFont(_font1);
-    _labelCurrentPage->setText("0");
-    _horizontalLayout_3->addWidget(_labelCurrentPage);
-
-    _label_5 = new QLabel(this);
-    _label_5->setFont(_font2);
-    _label_5->setText("/");
-    _horizontalLayout_3->addWidget(_label_5);
-
-    _labelMaxPage = new QLabel(this);
-    _labelMaxPage->setFont(_font1);
-    _labelMaxPage->setText("????");
-    _horizontalLayout_3->addWidget(_labelMaxPage);
-
-    _horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_3->addItem(_horizontalSpacer_4);
-
-    _verticalLayout->addLayout(_horizontalLayout_3);
-}
-
-void ExistingTables::renderingLayout_4()
-{
-    QFont font;
-    font.setFamily("Segoe UI");
-    font.setPointSize(14);
-
-    _horizontalLayout_4 = new QHBoxLayout();
-
-    _prevButton = new QPushButton(this);
-    _prevButton->setFont(font);
-    _prevButton->setText("<<");
-    _prevButton->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout_4->addWidget(_prevButton);
-
-    _horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_4->addItem(_horizontalSpacer_2);
-
-    _labelGoToPageNum = new QLabel(this);
-    _labelGoToPageNum->setFont(_font2);
-    _labelGoToPageNum->setText("Перейти к странице №:");
-    _horizontalLayout_4->addWidget(_labelGoToPageNum);
-
-    _pageNumberToNavigate = new QLineEdit(this);
-    _pageNumberToNavigate->setFont(_font2);
-    _pageNumberToNavigate->setValidator(new QIntValidator);
-    _pageNumberToNavigate->setMaximumWidth(35);
-    _horizontalLayout_4->addWidget(_pageNumberToNavigate);
-
-    _horizontalSpacer_3 = new QSpacerItem(70, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_4->addItem(_horizontalSpacer_3);
-
-    _nextButton = new QPushButton(this);
-    _nextButton->setFont(font);
-    _nextButton->setText(">>");
-    _nextButton->setStyleSheet(_pushButtonStyleSheet);
-    _horizontalLayout_4->addWidget(_nextButton);
-
-    _verticalLayout->addLayout(_horizontalLayout_4);
-}
-
-void ExistingTables::renderingLayout_5()
-{
-    QFont font;
-    font.setFamily("Segoe UI");
-    font.setPointSize(14);
-
-    _horizontalLayout_5 = new QHBoxLayout();
-
-    _horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_5->addItem(_horizontalSpacer_7);
-
-    int tact = 5;
-    for(int num = 10; num <= 20; num += tact)
-    {
-        QPushButton* numberRows = new QPushButton(this);
-        numberRows->setFont(font);
-        numberRows->setText(QString::number(num));
-        numberRows->setObjectName("_numberRows_" + QString::number(num));
-        _horizontalLayout_5->addWidget(numberRows);
-        _numberRows.push_back(numberRows);
-    }
-
-    _automaticNumberRows = new QPushButton(this);
-    _automaticNumberRows->setFont(font);
-    _automaticNumberRows->setText("Авто");
-    _automaticNumberRows->setObjectName("_automaticNumberRows");
-    _horizontalLayout_5->addWidget(_automaticNumberRows);
-    _numberRows.push_back(_automaticNumberRows);
-
-    _numberRows[0]->setStyleSheet(_pushButtonStyleSheet);
-
-    _horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_5->addItem(_horizontalSpacer_8);
-
-    _verticalLayout->addLayout(_horizontalLayout_5);
-}
-
-void ExistingTables::renderingLayout_6()
-{
-    _horizontalLayout_6 = new QHBoxLayout();
-
-    _status = new QLabel();
-    _horizontalLayout_6->addWidget(_status);
-
-    _horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout_6->addItem(_horizontalSpacer_9);
-
-    _verticalLayout->addLayout(_horizontalLayout_6);
-}
-
 
 void ExistingTables::searchInDB()
 {
@@ -444,8 +197,8 @@ void ExistingTables::searchInDB()
 
 void ExistingTables::initializationStartModel()
 {
-    _status->setText("Идёт загрузка данных...");
-    _tableView->setModel(nullptr);
+    ui->status->setText("Идёт загрузка данных...");
+    ui->tableView->setModel(nullptr);
 
     int setPages = _currentPage - currentPageInModel();
 
@@ -466,7 +219,7 @@ void ExistingTables::loadingModel(QSharedPointer<MyThread> thread, QSharedPointe
 void ExistingTables::startLoadModelFinished()
 {
     blockingInterface(true);
-    _status->clear();
+    ui->status->clear();
     setModel(_models[0]);
 
     if(!_like.isEmpty())
@@ -475,13 +228,13 @@ void ExistingTables::startLoadModelFinished()
 
 void ExistingTables::threadFinished()
 {
-    _nextButton->setEnabled(true);
-    _prevButton->setEnabled(true);
+    ui->nextButton->setEnabled(true);
+    ui->prevButton->setEnabled(true);
 }
 
 void ExistingTables::on_clearSearch_clicked()
 {
-    _searchText->clear();
+    ui->searchText->clear();
 }
 
 void ExistingTables::updateTablePage()
@@ -491,26 +244,19 @@ void ExistingTables::updateTablePage()
     int startIndex = (currentPageInModel() - 1) * _rowsPerPage;
     int endIndex = startIndex + _rowsPerPage;
 
-    int rowCountModel = _tableView->model()->rowCount();
+    int rowCountModel = ui->tableView->model()->rowCount();
     for (int row = 0; row < rowCountModel; row++)
     {
         bool rowVisible = (row >= startIndex && row < endIndex);
-        _tableView->setRowHidden(row, !rowVisible);
+        ui->tableView->setRowHidden(row, !rowVisible);
     }
 }
 
 void ExistingTables::updateCurrentPageInLabel()
 {
-    _labelCurrentPage->setText(QString::number(_currentPage));
+    ui->labelCurrentPage->setText(QString::number(_currentPage));
 }
 
-void ExistingTables::on_pageNumberToNavigate_textChanged()
-{
-    if(_pageNumberToNavigate->text() == "0")
-        _pageNumberToNavigate->clear();
-
-    _goToPageTimer.start(1000);
-}
 
 void ExistingTables::goToPage(int currentPage)
 {
@@ -531,7 +277,7 @@ void ExistingTables::on_prevButton_clicked()
 {
     if(_currentPage > 1)
     {
-        _nextButton->setEnabled(true);
+        ui->nextButton->setEnabled(true);
         if(currentPageInModel() == _minPageModel)
         {
             if (!_prevTreadModel->isRunning())
@@ -540,7 +286,7 @@ void ExistingTables::on_prevButton_clicked()
                     goToPrevModel();
             }
             else
-                _prevButton->setEnabled(false);
+                ui->prevButton->setEnabled(false);
         }
         else
         {
@@ -554,7 +300,7 @@ void ExistingTables::on_nextButton_clicked()
 {
     if(_currentPage < _maxPage)
     {
-        _prevButton->setEnabled(true);
+        ui->prevButton->setEnabled(true);
         if(currentPageInModel() == _maxPageModel)
         {
             if(!_nextTreadModel->isRun())
@@ -563,7 +309,7 @@ void ExistingTables::on_nextButton_clicked()
                     goToNextModel();
             }
             else
-                _nextButton->setEnabled(false);
+                ui->nextButton->setEnabled(false);
         }
         else
         {
@@ -583,9 +329,9 @@ void ExistingTables::setModel(QSharedPointer<QSqlQueryModel> model)
         return;
     }
 
-    _tableView->setModel(model.data());
+    ui->tableView->setModel(model.data());
 
-    _tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
     for (int col = 1; col < model->columnCount(); ++col)
     {
@@ -630,23 +376,24 @@ void ExistingTables::blockingInterface(bool flag)
     for(QComboBox* comboBox : comboBoxs)
         comboBox->setEnabled(flag);
 
-    _sorting->setEnabled(flag);
-    _pageNumberToNavigate->setEnabled(flag);
-    _searchText->setEnabled(flag);
+    ui->sorting->setEnabled(flag);
+    ui->pageNumberToNavigate->setEnabled(flag);
+    ui->searchText->setEnabled(flag);
 }
 
 void ExistingTables::refreshStartModel()
-{    
-    _columtSort = (_sortingOn) ? _sortingColumn->currentText() : "";
-    _typeSort = _typesSorting[_typeSorting->currentIndex()];
+{
+    _columtSort = (_sortingOn) ? ui->sortingColumn->currentText() : "";
+    _typeSort = _typesSorting[ui->typeSorting->currentIndex()];
     _like.clear();
 
     blockingInterface(false);
 
-    _labelMaxPage->setText("????");
-    _labelCurrentPage->setText("1");
+    ui->labelMaxPage->setText("????");
+    ui->labelCurrentPage->setText("1");
 
-    _pageNumberToNavigate->clear();
+    blockAndOperate(ui->pageNumberToNavigate, [&]() { ui->pageNumberToNavigate->clear(); });
+
     _currentPage = 1;
 
     _getMaxPageTread->getMaxPage(_tableWorkInDB, _rowsPerPage, _filter);
@@ -689,18 +436,18 @@ int ExistingTables::currentPageInModel()
 
 void ExistingTables::searchInModels()
 {
-    if(_searchText->text().isEmpty())
+    if(ui->searchText->text().isEmpty())
         return;
 
     bool resultSearchInModel = false;
-    _like = _searchText->text();
-    _column = _searchColumn->currentText();
+    _like = ui->searchText->text();
+    _column = ui->searchColumn->currentText();
 
     for (QSharedPointer<QSqlQueryModel> model : _models)
     {
         for (int row = 0; row < model->rowCount(); row++)
         {
-            QModelIndex index = model->index(row, _searchColumn->currentIndex() + 1);
+            QModelIndex index = model->index(row, ui->searchColumn->currentIndex() + 1);
             QVariant data = model->data(index);
 
             if (_typeSearch == "%")
@@ -713,26 +460,13 @@ void ExistingTables::searchInModels()
                 double resultRow = model->data(model->index(row, 0)).toDouble();
                 _currentPage = std::ceil(resultRow / _rowsPerPage);
                 setModel(model);
-                _tableView->setCurrentIndex(index);
+                ui->tableView->setCurrentIndex(index);
                 return;
             }
         }
     }
 
     searchInDB();
-}
-
-void ExistingTables::on_searchText_textChanged()
-{
-    _searchTimer.start(1000);
-}
-
-void ExistingTables::on_comboBox_currentTextChanged(const QString &arg1)
-{
-    Q_UNUSED(arg1);
-
-    if(!_like.isEmpty())
-        searchInModels();
 }
 
 void ExistingTables::blockAndOperate(QObject* widget, const std::function<void()>& operation)
@@ -745,9 +479,9 @@ void ExistingTables::blockAndOperate(QObject* widget, const std::function<void()
 
 void ExistingTables::resetTable()
 {
-    blockAndOperate(_searchText, [&]() { _searchText->clear(); });
-    blockAndOperate(_sortingColumn, [&]() { _sortingColumn->setCurrentIndex(0); });
-    blockAndOperate(_typeSorting, [&]() { _typeSorting->setCurrentIndex(0); });
+    blockAndOperate(ui->searchText, [&]() { ui->searchText->clear(); });
+    blockAndOperate(ui->sortingColumn, [&]() { ui->sortingColumn->setCurrentIndex(0); });
+    blockAndOperate(ui->typeSorting, [&]() { ui->typeSorting->setCurrentIndex(0); });
 
     _filterDialog->clearFilter();
 
@@ -764,7 +498,7 @@ void ExistingTables::on_checkBox_stateChanged(int arg1)
 
 void ExistingTables::on_pushButton_search_clicked()
 {
-    if(!_searchText->text().isEmpty())
+    if(!ui->searchText->text().isEmpty())
         searchInModels();
 }
 
@@ -773,20 +507,20 @@ void ExistingTables::onHeaderClicked(int logicalIndex)
     if(!_sortingOn)
         return;
 
-    QString headerText = _tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
+    QString headerText = ui->tableView->model()->headerData(logicalIndex, Qt::Horizontal).toString();
     headerText = headerText.replace("\n", " ");
 
-    if (_sortingColumn->currentText() == headerText)
+    if (ui->sortingColumn->currentText() == headerText)
     {
-        int currentSortIndex = _typeSorting->currentIndex();
-        currentSortIndex = (currentSortIndex + 1) % _typeSorting->count();
-        _typeSorting->setCurrentIndex(currentSortIndex);
+        int currentSortIndex = ui->typeSorting->currentIndex();
+        currentSortIndex = (currentSortIndex + 1) % ui->typeSorting->count();
+        ui->typeSorting->setCurrentIndex(currentSortIndex);
     }
     else
-        settingValueInComboBox(_sortingColumn, headerText);
+        settingValueInComboBox(ui->sortingColumn, headerText);
 
-    if(_searchColumn->currentText() != headerText)
-        settingValueInComboBox(_searchColumn, headerText);
+    if(ui->searchColumn->currentText() != headerText)
+        settingValueInComboBox(ui->searchColumn, headerText);
 }
 
 void ExistingTables::settingValueInComboBox(QComboBox* comboBox, QString& headerText)
@@ -800,7 +534,7 @@ void ExistingTables::setValueToMaxPage(int maxPage)
 {
     QMutexLocker locker(&_mutex);
     _maxPage = maxPage;
-    _labelMaxPage->setText(QString::number(_maxPage));
+    ui->labelMaxPage->setText(QString::number(_maxPage));
 }
 
 void ExistingTables::resizeEvent(QResizeEvent* event)
@@ -815,10 +549,10 @@ void ExistingTables::automaticNumberRows()
     if(!_autoNumRows)
         return;
 
-    if(_tableView->model())
+    if(ui->tableView->model())
     {
-        int visibleHeight = _tableView->viewport()->height();
-        int rowHeight = _tableView->verticalHeader()->defaultSectionSize();
+        int visibleHeight = ui->tableView->viewport()->height();
+        int rowHeight = ui->tableView->verticalHeader()->defaultSectionSize();
 
         if(visibleHeight / rowHeight != 0)
         {
@@ -839,7 +573,7 @@ void ExistingTables::changeNumberRows()
 
     button->setStyleSheet(_pushButtonStyleSheet);
 
-    if(button->objectName() == "_automaticNumberRows")
+    if(button->objectName() == "automaticNumberRows")
     {
         _autoNumRows = true;
         automaticNumberRows();
@@ -850,15 +584,15 @@ void ExistingTables::changeNumberRows()
 
     QStringList nums = button->objectName().split('_');
 
-    if (nums.size() >= 3)
-        QString num = nums[2];
+    if (nums.size() >= 2)
+        QString num = nums[1];
     else
     {
         qDebug() << "Размер листа " + QString::number(nums.size());
         return;
     }
 
-    int num = nums[2].toInt();
+    int num = nums[1].toInt();
 
     if(_rowsPerPage == num)
         return;
@@ -872,13 +606,13 @@ void ExistingTables::setValueNameColumn(QVector<QString>* namesColumn)
 {
     for(QString nameColumn : *namesColumn)
     {
-        _sortingColumn->blockSignals(true);
-        _sortingColumn->addItem(nameColumn);
-        _sortingColumn->blockSignals(false);
+        ui->sortingColumn->blockSignals(true);
+        ui->sortingColumn->addItem(nameColumn);
+        ui->sortingColumn->blockSignals(false);
 
-        _searchColumn->blockSignals(true);
-        _searchColumn->addItem(nameColumn);
-        _searchColumn->blockSignals(false);
+        ui->searchColumn->blockSignals(true);
+        ui->searchColumn->addItem(nameColumn);
+        ui->searchColumn->blockSignals(false);
     }
 
     if(!namesColumn->isEmpty())
@@ -921,7 +655,30 @@ void ExistingTables::hideEvent(QHideEvent* event)
         action->setVisible(false);
 }
 
-void ExistingTables::openMoreDetailed()
+void ExistingTables::on_searchColumn_currentIndexChanged(int index)
+{
+    Q_UNUSED(index);
+
+    if(!_like.isEmpty())
+        searchInModels();
+}
+
+void ExistingTables::on_moreDetailed_clicked()
 {
 
+}
+
+void ExistingTables::on_searchText_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+
+    _searchTimer.start(1000);
+}
+
+void ExistingTables::on_pageNumberToNavigate_textChanged(const QString &arg1)
+{
+    if(arg1 == "0")
+        ui->pageNumberToNavigate->clear();
+
+    _goToPageTimer.start(1000);
 }

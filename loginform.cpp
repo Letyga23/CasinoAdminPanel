@@ -1,22 +1,25 @@
 ﻿#include "loginform.h"
+#include "ui_loginform.h"
 #include "adminpanelwindow.h"
 #include "role.h"
 #include <QDebug>
 #include <QMessageBox>
 
-LoginForm::LoginForm(QWidget *parent)
-    : QMainWindow(parent)
+LoginForm::LoginForm(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::LoginForm)
 {
+    ui->setupUi(this);
     assigningValues();
-    renderingInterface();
     connects();
     creatingObjects();
 }
 
 LoginForm::~LoginForm()
 {
-    delete _widget;
+    delete ui;
 }
+
 
 void LoginForm::assigningValues()
 {
@@ -30,8 +33,8 @@ void LoginForm::assigningValues()
 
 void LoginForm::connects()
 {
-    connect(_logIn, &QPushButton::clicked, this, &LoginForm::logInSystem);
-    connect(_visiblePassword, &QPushButton::clicked, this, &LoginForm::visibilityPassword);
+    connect(ui->logIn, &QPushButton::clicked, this, &LoginForm::logInSystem);
+    connect(ui->visiblePassword, &QPushButton::clicked, this, &LoginForm::visibilityPassword);
 }
 
 void LoginForm::creatingObjects()
@@ -44,79 +47,9 @@ void LoginForm::creatingObjects()
     _query = QSharedPointer<QSqlQueryModel>::create();
 }
 
-void LoginForm::renderingInterface()
-{
-    setWindowTitle("Вход");
-    setFixedSize(370, 150);
-    //    setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint & ~Qt::WindowMinimizeButtonHint);
-
-    _widget = new QWidget();
-
-    _gridLayout = new QGridLayout(_widget);
-
-    renderingLayut_1();
-    renderingLayut_2();
-    renderingLayut_3();
-
-    setCentralWidget(_widget);
-}
-
-void LoginForm::renderingLayut_1()
-{
-
-    _loginLabel = new QLabel(_widget);
-    _loginLabel->setText("Логин: ");
-    _loginLabel->setFont(_fontBold);
-    _gridLayout->addWidget(_loginLabel, 0, 0);
-
-    _inputFieldLogin = new QLineEdit(_widget);
-    _inputFieldLogin->setFont(_font);
-    _inputFieldLogin->setMaximumWidth(200);
-    _gridLayout->addWidget(_inputFieldLogin, 0, 1);
-}
-
-void LoginForm::renderingLayut_2()
-{
-    _passworLabel = new QLabel(_widget);
-    _passworLabel->setText("Пароль: ");
-    _passworLabel->setFont(_fontBold);
-    _gridLayout->addWidget(_passworLabel, 1, 0);
-
-    _inputFieldPassword = new QLineEdit(_widget);
-    _inputFieldPassword->setFont(_font);
-    _inputFieldPassword->setMaximumWidth(200);
-    _inputFieldPassword->setEchoMode(QLineEdit::Password);
-    _gridLayout->addWidget(_inputFieldPassword, 1, 1);
-
-    _visiblePassword = new QPushButton(_widget);
-    _visiblePassword->setToolTip("Показать пароль");
-    _visiblePassword->setIcon(QIcon(":/assets/passwordClose.png"));
-    _visiblePassword->setIconSize(QSize(32, 32));
-    _gridLayout->addWidget(_visiblePassword, 1, 2);
-}
-
-void LoginForm::renderingLayut_3()
-{
-    _horizontalLayout = new QHBoxLayout();
-
-    _horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout->addItem(_horizontalSpacer);
-
-    _logIn = new QPushButton(_widget);
-    _logIn->setText("Войти");
-    _logIn->setFont(_fontBold);
-    _horizontalLayout->addWidget(_logIn);
-
-    _horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-    _horizontalLayout->addItem(_horizontalSpacer_2);
-
-    _gridLayout->addLayout(_horizontalLayout, 3, 0, 1, 3);
-}
-
-
 void LoginForm::logInSystem()
 {
-    QString request("SELECT role FROM role WHERE login = " + _inputFieldLogin->text() + " and password = " + _inputFieldPassword->text() + "");
+    QString request("SELECT role FROM role WHERE login = " + ui->inputFieldLogin->text() + " and password = " + ui->inputFieldPassword->text() + "");
 
     _db->open();
     _query->setQuery(request, *_db);
@@ -139,16 +72,16 @@ void LoginForm::logInSystem()
 
 void LoginForm::visibilityPassword()
 {
-    if (_inputFieldPassword->echoMode() == QLineEdit::Password)
+    if (ui->inputFieldPassword->echoMode() == QLineEdit::Password)
     {
-        _visiblePassword->setToolTip("Скрыть пароль");
-        _visiblePassword->setIcon(QIcon(":/assets/passwordOpen.png"));
-        _inputFieldPassword->setEchoMode(QLineEdit::Normal);
+        ui->visiblePassword->setToolTip("Скрыть пароль");
+        ui->visiblePassword->setIcon(QIcon(":/assets/passwordOpen.png"));
+        ui->inputFieldPassword->setEchoMode(QLineEdit::Normal);
     }
     else
     {
-        _visiblePassword->setToolTip("Показать пароль");
-        _visiblePassword->setIcon(QIcon(":/assets/passwordClose.png"));
-        _inputFieldPassword->setEchoMode(QLineEdit::Password);
+        ui->visiblePassword->setToolTip("Показать пароль");
+        ui->visiblePassword->setIcon(QIcon(":/assets/passwordClose.png"));
+        ui->inputFieldPassword->setEchoMode(QLineEdit::Password);
     }
 }
