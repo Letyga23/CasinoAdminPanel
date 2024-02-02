@@ -66,6 +66,7 @@ RESOURCES += \
     assets.qrc
 
 FORMS += \
+    adminpanelwindow.ui \
     creategametable.ui \
     existingtables.ui \
     filterdialog_existingtables.ui \

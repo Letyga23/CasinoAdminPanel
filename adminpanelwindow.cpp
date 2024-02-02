@@ -1,49 +1,34 @@
 ﻿#include "adminpanelwindow.h"
+#include "ui_adminpanelwindow.h"
 
 CreateGameTable* AdminPanelWindow::_createGameTableTab;
 ExistingTables* AdminPanelWindow::_existingTablesTab;
 LoanApplications* AdminPanelWindow::_loanApplicationsTab;
 
-AdminPanelWindow::AdminPanelWindow(QWidget *parent)
-    : QMainWindow(parent)
+AdminPanelWindow::AdminPanelWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::AdminPanelWindow)
 {
+    ui->setupUi(this);
+
     assigningValues();
     renderingInterface();
 }
 
 AdminPanelWindow::~AdminPanelWindow()
 {
-    delete _mainWidget;
-    delete _toolBar;
-    delete _menuBar;
-    delete _statusBar;
+    delete ui;
 }
+
 
 void AdminPanelWindow::renderingInterface()
 {
-    setWindowTitle("Админ панель");
-    resize(1200, 750);
+    ui->tabWidget->tabBar()->hide();
 
-    _mainWidget = new QWidget(this);
-    setCentralWidget(_mainWidget);
+    ui->statusbar->showMessage(Role::getRoleString());
 
-    _verticalLayout_Main = new QVBoxLayout(_mainWidget);
-
-    _tabWidget = new QTabWidget;
-    _tabWidget->tabBar()->hide();
-    _verticalLayout_Main->addWidget(_tabWidget);
-
-    _statusBar = new QStatusBar();
-    _statusBar->showMessage(Role::getRoleString());
-    setStatusBar(_statusBar);
-
-    _menuBar = new QMenuBar;
-    setMenuBar(_menuBar);
-
-    _toolBar = new QToolBar;
-    _toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    _toolBar->setStyleSheet("QToolBar { spacing: 10px; }");
-    addToolBar(_toolBar);
+    ui->toolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    ui->toolBar->setStyleSheet("QToolBar { spacing: 10px; }");
 
     switch (Role::getRoleEnum())
     {
@@ -56,31 +41,31 @@ void AdminPanelWindow::renderingInterface()
         break;
     }
 
-_menuBar->setFont(_standardFont);
+    ui->menubar->setFont(_standardFont);
 }
 
 void AdminPanelWindow::rendering_WelcomeTab()
 {
     _welcomTab = new Welcome(Role::getRoleString());
-    _tabWidget->addTab(_welcomTab, "");
+    ui->tabWidget->addTab(_welcomTab, "");
 }
 
 void AdminPanelWindow::rendering_CreateGameTableTab()
 {
     _createGameTableTab = new CreateGameTable();
-    _tabWidget->addTab(_createGameTableTab, "");
+    ui->tabWidget->addTab(_createGameTableTab, "");
 }
 
 void AdminPanelWindow::rendering_ExistingTablesTab()
 {
-    _existingTablesTab = new ExistingTables(_toolBar);
-    _tabWidget->addTab(_existingTablesTab, "");
+    _existingTablesTab = new ExistingTables(ui->toolBar);
+    ui->tabWidget->addTab(_existingTablesTab, "");
 }
 
 void AdminPanelWindow::rendering_LoanApplicationsTab()
 {
-    _loanApplicationsTab = new LoanApplications(_toolBar);
-    _tabWidget->addTab(_loanApplicationsTab, "");
+    _loanApplicationsTab = new LoanApplications(ui->toolBar);
+    ui->tabWidget->addTab(_loanApplicationsTab, "");
 }
 
 
@@ -113,19 +98,19 @@ void AdminPanelWindow::creatingObjects_Diller()
 void AdminPanelWindow::openCreateTable()
 {
     selectAction();
-    _tabWidget->setCurrentWidget(_createGameTableTab);
+    ui->tabWidget->setCurrentWidget(_createGameTableTab);
 }
 
 void AdminPanelWindow::openExistingTable()
 {
     selectAction();
-    _tabWidget->setCurrentWidget(_existingTablesTab);
+    ui->tabWidget->setCurrentWidget(_existingTablesTab);
 }
 
 void AdminPanelWindow::openLoanAplications()
 {
     selectAction();
-    _tabWidget->setCurrentWidget(_loanApplicationsTab);
+    ui->tabWidget->setCurrentWidget(_loanApplicationsTab);
 }
 
 void AdminPanelWindow::rendering_Admin()
@@ -159,13 +144,13 @@ void AdminPanelWindow::rendering_MenuBar_Admin()
 {
     rendering_MenuBar_Diller();
 
-    _menuBar->addAction(_openLoanAplications);
+    ui->menubar->addAction(_openLoanAplications);
 }
 
 void AdminPanelWindow::rendering_MenuBar_Diller()
 {
-    _menuBar->addAction(_openCreateTable);
-    _menuBar->addAction(_openExistingTable);
+    ui->menubar->addAction(_openCreateTable);
+    ui->menubar->addAction(_openExistingTable);
 }
 
 void AdminPanelWindow::selectAction()

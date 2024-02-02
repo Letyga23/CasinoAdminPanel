@@ -1,43 +1,34 @@
-﻿#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+﻿#ifndef ADMINPANELWINDOW_H
+#define ADMINPANELWINDOW_H
 
 #include <QMainWindow>
 #include <QAction>
-#include <QToolBar>
-#include <QMenuBar>
-#include <QStatusBar>
 #include "existingtables.h"
 #include "loanapplications.h"
 #include "creategametable.h"
 #include "role.h"
 #include "welcome.h"
 
+namespace Ui {
+class AdminPanelWindow;
+}
+
 class AdminPanelWindow : public QMainWindow
 {
     Q_OBJECT
+
+    Ui::AdminPanelWindow *ui;
     QAction* _lastAction;
     QFont _standardFont;
 
-private:
-    QWidget* _mainWidget;
-
     Welcome* _welcomTab;
-
-    QVBoxLayout* _verticalLayout_Main;
-
-    QStatusBar* _statusBar;
-
-    QTabWidget* _tabWidget;
-
-    QMenuBar* _menuBar;
-    QToolBar* _toolBar;
 
     QAction* _openCreateTable;
     QAction* _openExistingTable;
     QAction* _openLoanAplications;
 
 public:
-    AdminPanelWindow(QWidget *parent = nullptr);
+    explicit AdminPanelWindow(QWidget *parent = nullptr);
     ~AdminPanelWindow();
 
     static CreateGameTable* _createGameTableTab;
@@ -70,6 +61,6 @@ private slots:
     void openCreateTable();
     void openExistingTable();
     void openLoanAplications();
-
 };
-#endif // MAINWINDOW_H
+
+#endif // ADMINPANELWINDOW_H
